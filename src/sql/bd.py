@@ -2,6 +2,8 @@ import datetime
 import sqlite3
 from datetime import datetime
 
+from src.logger._logger import logger_msg
+
 
 class BotDB:
     __instance = None
@@ -37,6 +39,19 @@ class BotDB:
         except Exception as es:
             print(f'SQL исключение check_table users {es}')
 
+        try:
+            self.cursor.execute(f"CREATE TABLE IF NOT EXISTS "
+                                f"statistic (id_pk INTEGER PRIMARY KEY AUTOINCREMENT, "
+                                f"marketplace TEXT, "
+                                f"brand TEXT, "
+                                f"orders NUMERIC, "
+                                f"profit FLOAT, "
+                                f"date DATETIME, "
+                                f"other TEXT)")
+
+        except Exception as es:
+            print(f'SQL исключение check_table statistic {es}')
+
     def check_or_add_user(self, id_user, login):
 
         result = self.cursor.execute(f"SELECT * FROM users WHERE id_user='{id_user}'")
@@ -56,6 +71,34 @@ class BotDB:
             return True
 
         return False
+
+    def check_or_add_static(self, sql_data):
+
+        try:
+
+            result = self.cursor.execute(f"SELECT * FROM statistic WHERE date='{sql_data['date']}' and "
+                                         f"marketplace='{sql_data['marketplace']}' and brand='{sql_data['brand']}'")
+
+            response = result.fetchall()
+
+            if not response:
+                self.cursor.execute("INSERT OR IGNORE INTO statistic ('marketplace', 'brand',"
+                                    "'orders', 'profit', 'date') VALUES (?,?,?,?,?)",
+                                    (sql_data['marketplace'], sql_data['brand'],
+                                     sql_data['orders'], sql_data['profit'], sql_data['date']))
+
+                self.conn.commit()
+
+                return True
+
+            return True
+
+        except Exception as es:
+            import asyncio
+
+            asyncio.run(logger_msg(f'Ошибка сохранения в базу данных "{es}"'))
+
+            return False
 
     def close(self):
         self.conn.close()

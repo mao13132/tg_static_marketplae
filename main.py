@@ -1,5 +1,8 @@
 import asyncio
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from src.get_data.get_data_core import GetDate
 from src.telegram.bot_core import *
 from src.telegram.callbacks.call_user import register_callbacks
 from src.telegram.handlers.users import register_user
@@ -19,11 +22,18 @@ def registration_calls(dp):
 
 
 async def main():
+
+    scheduler = AsyncIOScheduler()
+
     bot_start = Core()
+
+    scheduler.add_job(GetDate(bot_start).start_get_statistic, 'interval', seconds=1, misfire_grace_time=300)
 
     registration_state(bot_start.dp)
     registration_all_handlers(bot_start.dp)
     registration_calls(bot_start.dp)
+
+    scheduler.start()
 
     try:
         await bot_start.dp.start_polling()
