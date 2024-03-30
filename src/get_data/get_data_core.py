@@ -7,7 +7,7 @@
 #
 # ---------------------------------------------
 from src.get_data.ozon_get_orders import get_statistic_orders_ozon
-from src.get_data.wb_get_orders_incorrect_total import wb_get_orders
+from src.get_data.wb_get_product_and_orders import wb_get_product_and_orders
 from src.get_data.wb_get_sales import wb_get_sales
 from src.utils.generate_date import minus_days
 
@@ -24,5 +24,7 @@ class GetDate:
         # res_ozon = await get_statistic_orders_ozon(self.BotDB, self.target_day)
 
         # res_sales_wb = await wb_get_sales(self.BotDB, self.target_day)
+
+        res = await wb_get_product_and_orders(self.BotDB, self.target_day)
 
         print()

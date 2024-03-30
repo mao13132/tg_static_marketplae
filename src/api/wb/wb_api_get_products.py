@@ -16,9 +16,9 @@ from src.api.wb.wb_api_core import WBApiCore
 from src.logger._logger import logger_msg
 
 
-class WBApiOrders(WBApiCore):
-    async def _get_orders_and_profit(self, api_key, start_date):
-        url_get_img = self.url_statistic + f'api/v1/supplier/orders?dateFrom={start_date}&flag=1'
+class WBApiGetProducts(WBApiCore):
+    async def _get_products(self, api_key):
+        url_get_img = self.url_discount + f'api/v2/list/goods/filter?limit=1000'
 
         headers_price = {'Content-Type': 'application/json',
                          'Authorization': api_key
@@ -33,14 +33,14 @@ class WBApiOrders(WBApiCore):
                     response = await resul.json()
 
                     if resul.status == 200 and not response:
-                        await logger_msg(f'WB API ORDERS: Нулевой ответ от серверов WB ')
+                        await logger_msg(f'WB API Products: Нулевой ответ от серверов WB ')
 
                         return False
 
                     return response
 
         except Exception as es:
-            await logger_msg(f'WB API ORDERS PROFIT: Ошибка при получение заказов "{es}"')
+            await logger_msg(f'WB API Products: Ошибка при получение продуктов "{es}"')
 
             return '-1'
 
@@ -52,24 +52,24 @@ class WBApiOrders(WBApiCore):
 
         if 'too many requests' in error:
             print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} '
-                  f'WB API ORDERS check_error: Частые запросы - жду {self.time_try}с у "{brand}"')
+                  f'WB API Products check_error: Частые запросы - жду {self.time_try}с у "{brand}"')
             return '-1'
 
-        msg = f'WB API ORDERS: Ошибка при заказов по API у {brand}\n"{error}"'
+        msg = f'WB API Products: Ошибка при получение продуктов по API у {brand}\n"{error}"'
 
         await logger_msg(msg, push=True)
 
         return True
 
-    async def loop_get_orders(self, brand, start_date):
+    async def loop_get_products(self, brand):
 
-        api_key = await wb_get_api_key(brand, 0)
+        api_key = await wb_get_api_key(brand, 1)
 
         if not api_key:
             return False
 
         for _try in range(self.count_try):
-            data_response = await self._get_orders_and_profit(api_key, start_date)
+            data_response = await self._get_products(api_key)
 
             if data_response == '-1':
                 time.sleep(self.time_try)
@@ -89,9 +89,14 @@ class WBApiOrders(WBApiCore):
             if is_error:
                 return False
 
-            return data_response
+            try:
+                result = data_response['data']['listGoods']
+            except:
+                continue
 
-        msg = f'WB API ORDERS: исчерпаны все попытки на получение заказов и выручки у {brand}'
+            return result
+
+        msg = f'WB API Products: исчерпаны все попытки на получение продуктов у {brand}'
 
         await logger_msg(msg, push=True)
 

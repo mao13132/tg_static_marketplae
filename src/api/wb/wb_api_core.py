@@ -17,6 +17,8 @@ class WBApiCore:
 
         self.url_advert = f'https://advert-api.wb.ru/adv/'
 
+        self.url_discount = f'https://discounts-prices-api.wb.ru/'
+
         self.time_try = 15
 
         self.count_try = 10

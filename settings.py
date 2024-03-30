@@ -37,11 +37,11 @@ OZON_API_KEY_LIST = {
 }
 
 WB_API_KEY_LIST = {
-    # NAME_BRAND[3]: [os.getenv('api_key'), os.getenv('api_key2')],
-    # NAME_BRAND[4]: [os.getenv('api_key_guru'), os.getenv('api_key_guru2')],
+    NAME_BRAND[3]: [os.getenv('api_key'), os.getenv('api_key2')],
+    NAME_BRAND[4]: [os.getenv('api_key_guru'), os.getenv('api_key_guru2')],
     NAME_BRAND[6]: [os.getenv('api_key_po'), os.getenv('api_key_po2')],
-    # NAME_BRAND[7]: [os.getenv('api_key_shelepina'), os.getenv('api_key_shelepina2')],
-    # NAME_BRAND[5]: [os.getenv('api_key_iggi'), os.getenv('api_key_iggi2')],
-    # NAME_BRAND[0]: [os.getenv('api_key_benerich'), os.getenv('api_key_benerich2')],
-    # NAME_BRAND[9]: [os.getenv('api_key_dealex'), os.getenv('api_key_dealex2')]
+    NAME_BRAND[7]: [os.getenv('api_key_shelepina'), os.getenv('api_key_shelepina2')],
+    NAME_BRAND[5]: [os.getenv('api_key_iggi'), os.getenv('api_key_iggi2')],
+    NAME_BRAND[0]: [os.getenv('api_key_benerich'), os.getenv('api_key_benerich2')],
+    NAME_BRAND[9]: [os.getenv('api_key_dealex'), os.getenv('api_key_dealex2')]
 }

@@ -7,7 +7,7 @@
 #
 # ---------------------------------------------
 from settings import WB_API_KEY_LIST
-from src.api.wb.wb_api_orders import WBApiOrders
+from src.api.wb.wb_api_orders_incorrect import WBApiOrders
 
 
 async def wb_get_orders_incorrect_total(BotDB, target_day):
