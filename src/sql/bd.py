@@ -44,8 +44,9 @@ class BotDB:
                                 f"statistic (id_pk INTEGER PRIMARY KEY AUTOINCREMENT, "
                                 f"marketplace TEXT, "
                                 f"brand TEXT, "
-                                f"orders NUMERIC, "
-                                f"profit FLOAT, "
+                                f"type TEXT, "
+                                f"count NUMERIC, "
+                                f"money FLOAT, "
                                 f"date DATETIME, "
                                 f"other TEXT)")
 
@@ -76,16 +77,28 @@ class BotDB:
 
         try:
 
-            result = self.cursor.execute(f"SELECT * FROM statistic WHERE date='{sql_data['date']}' and "
-                                         f"marketplace='{sql_data['marketplace']}' and brand='{sql_data['brand']}'")
+            result = self.cursor.execute(
+                f"SELECT id_pk, count, money FROM statistic WHERE type='{sql_data['type']}' and "
+                f"date='{sql_data['date']}' and marketplace='{sql_data['marketplace']}' "
+                f"and brand='{sql_data['brand']}'")
 
             response = result.fetchall()
 
             if not response:
-                self.cursor.execute("INSERT OR IGNORE INTO statistic ('marketplace', 'brand',"
-                                    "'orders', 'profit', 'date') VALUES (?,?,?,?,?)",
+                self.cursor.execute("INSERT OR IGNORE INTO statistic ('marketplace', 'brand', 'type',"
+                                    "'count', 'money', 'date') VALUES (?,?,?,?,?,?)",
                                     (sql_data['marketplace'], sql_data['brand'],
-                                     sql_data['orders'], sql_data['profit'], sql_data['date']))
+                                     sql_data['type'], sql_data['count'], sql_data['money'], sql_data['date']))
+
+                self.conn.commit()
+
+                return True
+
+            id_pk, count, money = response[0]
+
+            if count != sql_data['count'] or money != sql_data['money']:
+                self.cursor.execute(f"UPDATE statistic SET count = '{sql_data['count']}', "
+                                    f"money = '{sql_data['money']}'  WHERE id_pk = '{id_pk}'")
 
                 self.conn.commit()
 

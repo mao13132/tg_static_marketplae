@@ -11,7 +11,7 @@ from src.api.ozon.ozon_api_orders_profit import OzonApiOrdersProfit
 from src.logger._logger import logger_msg
 
 
-async def get_statistic_ozon(BotDB, target_day):
+async def get_statistic_orders_ozon(BotDB, target_day):
     print(f'Начинаю получать данные с OZON')
 
     ozon_core = OzonApiOrdersProfit()
@@ -33,8 +33,9 @@ async def get_statistic_ozon(BotDB, target_day):
         sql_data = {
             'marketplace': 'ozon',
             'brand': brand,
-            'orders': orders,
-            'profit': profit,
+            'type': 'order',
+            'count': orders,
+            'money': profit,
             'date': target_day,
         }
 
