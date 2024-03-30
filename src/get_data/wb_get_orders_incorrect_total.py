@@ -7,42 +7,41 @@
 #
 # ---------------------------------------------
 from settings import WB_API_KEY_LIST
-from src.api.wb.wb_api_sales import WBApiSales
-from src.logger._logger import logger_msg
+from src.api.wb.wb_api_orders import WBApiOrders
 
 
-async def wb_get_sales(BotDB, target_day):
-    print(f'Начинаю получать продажи с WB')
+async def wb_get_orders_incorrect_total(BotDB, target_day):
+    print(f'Начинаю получать заказы с WB')
 
-    wb_core = WBApiSales()
+    wb_core = WBApiOrders()
 
     is_good = True
 
     for brand, security in WB_API_KEY_LIST.items():
 
-        print(f'Начинаю получать продажи с {brand}')
+        print(f'Начинаю получать заказы с {brand}')
 
-        data_statistic = await wb_core.loop_get_sales(brand, target_day)
+        data_statistic = await wb_core.loop_get_orders(brand, target_day)
 
         if data_statistic:
             money = 0
 
-            for sale in data_statistic:
-                money += sale['forPay']
+            for order in data_statistic:
+                money += order['priceWithDisc']
 
-            sales = len(data_statistic)
+            orders = len(data_statistic)
 
             money = round(money, 2)
         else:
             money = 0
 
-            sales = 0
+            orders = 0
 
         sql_data = {
             'marketplace': 'wb',
             'brand': brand,
-            'type': 'sale',
-            'count': sales,
+            'type': 'order',
+            'count': orders,
             'money': money,
             'date': target_day,
         }
@@ -52,7 +51,7 @@ async def wb_get_sales(BotDB, target_day):
         if not res:
             is_good = False
 
-        print(f'Обработал продажи WB "{brand}"')
+        print(f'Обработал заказы WB "{brand}"')
 
     print(f'Обработал все бренды по продажам WB')
 
