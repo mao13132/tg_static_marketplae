@@ -4,4 +4,5 @@ venv/
 __pycache__/
 src/.env
 logs.txt
+DB.db
 
