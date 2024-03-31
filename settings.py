@@ -8,7 +8,9 @@ ADMIN = ['1422194909']
 
 TOKEN = os.getenv('TOKEN')
 
-START_MESSAGE = 'Стартовое сообщение'
+LOGO = r'src/telegram/media/logo.png'
+
+START_MESSAGE = '⚙️Админ панель'
 
 MARKETPLACE = ['ozon', 'wb']
 

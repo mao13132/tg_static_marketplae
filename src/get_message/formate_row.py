@@ -40,7 +40,7 @@ async def formate_row(now_day, yesterday):
         icon_money = '🔻' if count_percent_money < 0 else '🔝'
 
         target_row = f'{money_now}р / {count_now} шт. ' \
-                     f'({count_percent_money}%  {icon_money} / {count_percent_count}% {icon_count} )'
+                     f'({count_percent_money}%{icon_money} / {count_percent_count}%{icon_count})'
 
     except Exception as es:
         await logger_msg(f'Ошибка при высчитывание значения из строчки "{es}"')

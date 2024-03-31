@@ -15,12 +15,12 @@ from src.utils.generate_date import minus_days
 
 
 class GetDate:
-    def __init__(self, bot_start):
+    def __init__(self, BotDB):
         self.target_day = minus_days(1)
 
         self.analyst_day = minus_days(2)
 
-        self.BotDB = bot_start.BotDB
+        self.BotDB = BotDB
 
     async def get_data_from_marketplace(self):
         res_orders_ozon = await get_statistic_orders_ozon(self.BotDB, self.target_day)
@@ -35,8 +35,8 @@ class GetDate:
 
         return True
 
-    async def send_statistic(self):
-        # result_get_statistic = await self.get_data_from_marketplace()
+    async def get_statistic_msg(self):
+        result_get_statistic = await self.get_data_from_marketplace()
 
         message_settings = {
             'BotDB': self.BotDB,

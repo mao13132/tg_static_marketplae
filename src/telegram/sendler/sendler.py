@@ -46,23 +46,23 @@ class Sendler_msg:
 
     async def send_msg_call(call: types.CallbackQuery, text_msg, keyb):
         try:
-            await call.message.edit_caption(caption=text_msg, reply_markup=keyb)
+            msg = await call.message.edit_caption(caption=text_msg, reply_markup=keyb)
         except Exception as es:
             # print(f'Ошибка редактирования поста: {es}')
             try:
                 with open(LOGO, 'rb') as file:
-                    await call.message.bot.send_photo(call.message.chat.id, file, caption=(text_msg),
+                    msg = await call.message.bot.send_photo(call.message.chat.id, file, caption=(text_msg),
                                                       reply_markup=keyb)
             except:
                 try:
-                    await call.message.bot.send_message(call.message.chat.id, text_msg,
+                    msg = await call.message.bot.send_message(call.message.chat.id, text_msg,
                                                         reply_markup=keyb)
 
                 except Exception as es:
                     print(f'Произошла ошибка при отправке поста текст: "{text_msg}" ошибка: "{es}"')
                     return False
 
-        return True
+        return msg
 
     async def send_msg_message(message: Message, text_msg, keyb):
         if message.photo != []:

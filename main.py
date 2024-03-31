@@ -27,7 +27,7 @@ async def main():
 
     bot_start = Core()
 
-    scheduler.add_job(GetDate(bot_start).send_statistic, 'interval', seconds=1, misfire_grace_time=300)
+    # scheduler.add_job(GetDate(bot_start.BotDB).send_statistic, 'interval', seconds=1, misfire_grace_time=300)
 
     registration_state(bot_start.dp)
     registration_all_handlers(bot_start.dp)
