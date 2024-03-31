@@ -13,15 +13,15 @@ START_MESSAGE = 'Стартовое сообщение'
 MARKETPLACE = ['ozon', 'wb']
 
 NAME_BRAND = {
-    0: 'Benerich',
-    1: 'CaptainOil',
-    2: 'Ergonom Office',
     3: 'GreenFormula',
     4: 'Guru',
-    5: 'iGGi',
+    0: 'Benerich',
     6: 'Kronly',
     7: 'Little Dreams',
     8: 'Militon',
+    5: 'iGGi',
+    1: 'CaptainOil',
+    2: 'Ergonom Office',
     9: 'Udnet Retail',
 }
 
