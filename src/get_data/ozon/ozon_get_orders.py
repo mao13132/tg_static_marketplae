@@ -12,7 +12,7 @@ from src.logger._logger import logger_msg
 
 
 async def get_statistic_orders_ozon(BotDB, target_day):
-    print(f'Начинаю получать данные о заказах с OZON')
+    print(f'\nНачинаю получать данные о заказах с OZON\n')
 
     ozon_core = OzonApiOrdersProfit()
 

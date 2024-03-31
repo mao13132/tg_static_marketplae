@@ -14,7 +14,7 @@ from src.logger._logger import logger_msg
 
 
 async def wb_get_product_and_orders(BotDB, target_day):
-    print(f'Начинаю получать заказы с WB')
+    print(f'\nНачинаю получать заказы с WB\n')
 
     wb_core = WBApiOrders()
 

@@ -10,6 +10,7 @@ from src.get_data.ozon.ozon_get_orders import get_statistic_orders_ozon
 from src.get_data.ozon.ozon_get_sales import get_statistic_sales_ozon
 from src.get_data.wb.wb_get_product_and_orders import wb_get_product_and_orders
 from src.get_data.wb.wb_get_sales import wb_get_sales
+from src.get_message.get_message_core import GetMessageCore
 from src.utils.generate_date import minus_days
 
 
@@ -21,13 +22,28 @@ class GetDate:
 
         self.BotDB = bot_start.BotDB
 
-    async def start_get_statistic(self):
-        res_ozon = await get_statistic_orders_ozon(self.BotDB, self.target_day)
+    async def get_data_from_marketplace(self):
+        res_orders_ozon = await get_statistic_orders_ozon(self.BotDB, self.target_day)
 
         res_sales_wb = await wb_get_sales(self.BotDB, self.target_day)
 
+        res_sales_ozon = await get_statistic_sales_ozon(self.BotDB, self.target_day)
+
         res_orders_wb = await wb_get_product_and_orders(self.BotDB, self.target_day)
 
-        res_sale_ozon = await get_statistic_sales_ozon(self.BotDB, self.target_day)
+        print(f'\nЗакончил сбор данных с маркетплейсов\n')
 
-        print()
+        return True
+
+    async def send_statistic(self):
+        # result_get_statistic = await self.get_data_from_marketplace()
+
+        message_settings = {
+            'BotDB': self.BotDB,
+            'target_day': self.target_day,
+            'analyst_day': self.analyst_day,
+        }
+
+        _message = await GetMessageCore(message_settings).start_get_message()
+
+        return _message

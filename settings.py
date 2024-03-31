@@ -10,6 +10,8 @@ TOKEN = os.getenv('TOKEN')
 
 START_MESSAGE = 'Стартовое сообщение'
 
+MARKETPLACE = ['ozon', 'wb']
+
 NAME_BRAND = {
     0: 'Benerich',
     1: 'CaptainOil',

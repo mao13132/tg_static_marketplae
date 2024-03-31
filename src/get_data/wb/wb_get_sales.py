@@ -12,7 +12,7 @@ from src.logger._logger import logger_msg
 
 
 async def wb_get_sales(BotDB, target_day):
-    print(f'Начинаю получать продажи с WB')
+    print(f'\nНачинаю получать продажи с WB\n')
 
     wb_core = WBApiSales()
 
