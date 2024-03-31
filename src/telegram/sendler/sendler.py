@@ -127,10 +127,10 @@ class Sendler_msg:
 
     async def log_client_call(call: types.CallbackQuery):
 
-        print()
-        print(f'{str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} '
-              f'"{call.message.chat.full_name}" Кликает по кнопке "{call.data}"')
-        print()
+        await call.bot.answer_callback_query(call.id)
+
+        print(f'\n{str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} '
+              f'"{call.message.chat.full_name}" Кликает по кнопке "{call.data}"\n')
         try:
             await call.bot.answer_callback_query(call.id)
         except Exception as es:

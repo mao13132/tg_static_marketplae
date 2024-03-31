@@ -53,6 +53,51 @@ class BotDB:
         except Exception as es:
             print(f'SQL исключение check_table statistic {es}')
 
+        try:
+            self.cursor.execute(f"CREATE TABLE IF NOT EXISTS "
+                                f"settings (id_pk INTEGER PRIMARY KEY AUTOINCREMENT, "
+                                f"key TEXT, "
+                                f"value TEX)")
+
+        except Exception as es:
+            print(f'SQL исключение settings {es}')
+
+    def edit_settings(self, key, value):
+
+        result = self.cursor.execute(f"SELECT value FROM settings "
+                                     f"WHERE key = '{key}'")
+
+        response = result.fetchall()
+
+        if not response:
+            self.cursor.execute("INSERT OR IGNORE INTO settings ('key', 'value') VALUES (?,?)",
+                                (key, value))
+
+            self.conn.commit()
+
+            return True
+
+        else:
+            self.cursor.execute(f"UPDATE settings SET value = '{value}' WHERE key = '{key}'")
+
+            self.conn.commit()
+
+            return True
+
+    def get_settings_by_key(self, key):
+
+        result = self.cursor.execute(f"SELECT value FROM settings "
+                                     f"WHERE key = '{key}'")
+
+        response = result.fetchall()
+
+        try:
+            result = response[0][0]
+        except:
+            return False
+
+        return result
+
     def check_or_add_user(self, id_user, login):
 
         result = self.cursor.execute(f"SELECT * FROM users WHERE id_user='{id_user}'")
