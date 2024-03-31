@@ -16,9 +16,9 @@ from src.logger._logger import logger_msg
 from src.api.ozon.ozon_api_core import OzonApiCore
 
 
-class OzonApiOrdersProfit(OzonApiCore):
-    async def _get_orders_profit(self, client_id, api_key, start_date, end_date):
-        url_get_img = self.url_seller + f'v1/analytics/data'
+class OzonApiSales(OzonApiCore):
+    async def _get_sales(self, client_id, api_key, start_date):
+        url_get_img = self.url_seller + f'v3/finance/transaction/list'
 
         header_ = {'Content-Type': 'application/json',
                    'Client-Id': client_id,
@@ -26,24 +26,16 @@ class OzonApiOrdersProfit(OzonApiCore):
                    }
 
         data_ = {
-            "date_from": start_date,
-            "date_to": end_date,
-            "metrics": [
-                "ordered_units", "revenue"
-            ],
-            "dimension": [
-                "sku",
-                "day"
-            ],
-            "filters": [],
-            "sort": [
-                {
-                    "key": "sku",
-                    "order": "DESC"
-                }
-            ],
-            "limit": 1000,
-            "offset": 0
+            "filter": {
+                "date": {
+                    "from": f"{start_date}T00:00:00.000Z",
+                    "to": f"{start_date}T00:00:00.000Z"
+                },
+                "operation_type": ["OperationAgentDeliveredToCustomerCanceled"],
+                "transaction_type": "orders"
+            },
+            "page": 1,
+            "page_size": 1000
         }
 
         try:
@@ -56,12 +48,12 @@ class OzonApiOrdersProfit(OzonApiCore):
                     response = await resul.json()
 
                     if resul.status == 200 and not response:
-                        await logger_msg(f'OZON API ORDERS PROFIT: Нулевой ответ от серверов')
+                        await logger_msg(f'OZON API SALES: Нулевой ответ от серверов')
 
                     return response
 
         except Exception as es:
-            await logger_msg(f'OZON API ORDERS PROFIT: Ошибка при получение order-profit "{es}"')
+            await logger_msg(f'OZON API SALES: Ошибка при получение данных о продажах "{es}"')
 
             return '-1'
 
@@ -73,16 +65,16 @@ class OzonApiOrdersProfit(OzonApiCore):
 
         if 'too many requests' in error or 'rate limit' in error:
             print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} '
-                  f'OZON API ORDERS PROFIT check_error: Частые запросы - жду 60с у "{name_sheet}"')
+                  f'OZON API SALES check_error: Частые запросы - жду 60с у "{name_sheet}"')
             return '-1'
 
-        msg = f'OZON API ORDERS PROFIT: Ошибка при получения order-profit по API у {name_sheet}\n"{error}"'
+        msg = f'OZON API SALES: Ошибка при получения данных о продажах по API у {name_sheet}\n"{error}"'
 
         await logger_msg(msg, push=True)
 
         return True
 
-    async def loop_get_orders_profit(self, name_sheet, security, start_date, end_date):
+    async def loop_get_sales_ozon(self, name_sheet, security, start_date):
 
         client_id, api_key = await get_api_key(security)
 
@@ -90,7 +82,7 @@ class OzonApiOrdersProfit(OzonApiCore):
             return False
 
         for _try in range(self.count_try):
-            data_response = await self._get_orders_profit(client_id, api_key, start_date, end_date)
+            data_response = await self._get_sales(client_id, api_key, start_date)
 
             if data_response == '-1':
                 time.sleep(self.time_try)
@@ -111,16 +103,14 @@ class OzonApiOrdersProfit(OzonApiCore):
                 continue
 
             try:
-                result = data_response['result']['totals']
+                result = data_response['result']['operations']
             except:
                 continue
 
             return result
 
-        msg = f'OZON API ORDERS PROFIT: исчерпаны все попытки на получение order-profit у {name_sheet}'
+        msg = f'OZON API SALES: исчерпаны все попытки на получение данных о продажах у {name_sheet}'
 
         await logger_msg(msg, push=True)
 
         return False
-
-
