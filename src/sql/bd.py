@@ -152,6 +152,25 @@ class BotDB:
 
         return response
 
+    def get_all_marketplace_by_brands(self, brand, day, _type):
+        try:
+
+            result = self.cursor.execute(f"SELECT SUM(count), SUM(money) FROM statistic "
+                                         f"WHERE brand = '{brand}' AND "
+                                         f"date = '{day}' AND type = '{_type}'")
+
+            response = result.fetchall()
+
+            response = response[0]
+
+
+        except Exception as es:
+            print(f'Ошибка SQL get_all_marketplace_by_brands: {es}')
+
+            return 0, 0
+
+        return response
+
     def close(self):
         self.conn.close()
         print('Отключился от SQL BD')

@@ -6,7 +6,8 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from src.get_message.sales_by_brands.sales_block import SalesBlock
+from src.get_message.all_market_by_brands_block.all_market_by_brands import AllMarketByBrands
+from src.get_message.sales_by_brands_block.sales_block import SalesBlock
 from src.get_message.total_block.total_block import TotalBlock
 
 
@@ -25,7 +26,9 @@ class GetMessageCore:
 
         # total_block = await TotalBlock(self.settings).get_total_block()
 
-        sales_block = await SalesBlock(self.settings).start_sales_block()
+        # sales_block = await SalesBlock(self.settings).start_sales_block()
+
+        brands_block = await AllMarketByBrands(self.settings).start_sales_block()
 
         print()
 

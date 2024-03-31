@@ -44,18 +44,18 @@ class TotalBlock:
         return True
 
     async def get_all_sales(self, marketplace):
-        all_order_by_place_now = self.BotDB.get_all_orders_by_marketplace(marketplace, self.target_day, 'sale')
+        all_sales_by_place_now = self.BotDB.get_all_orders_by_marketplace(marketplace, self.target_day, 'sale')
 
-        all_order_by_place_yesterday = self.BotDB.get_all_orders_by_marketplace(marketplace, self.analyst_day, 'sale')
+        all_sales_by_place_yesterday = self.BotDB.get_all_orders_by_marketplace(marketplace, self.analyst_day, 'sale')
 
-        data_row_text = await formate_row(all_order_by_place_now, all_order_by_place_yesterday)
+        data_row_text = await formate_row(all_sales_by_place_now, all_sales_by_place_yesterday)
 
         exist_place = self.data.get(marketplace, False)
 
         if not exist_place:
             self.data[marketplace] = {}
 
-        self.data[marketplace]['sales_count'], self.data[marketplace]['sales_money'] = all_order_by_place_now
+        self.data[marketplace]['sales_count'], self.data[marketplace]['sales_money'] = all_sales_by_place_now
 
         self.data[marketplace]['sales_text'] = data_row_text
 
