@@ -17,7 +17,8 @@ async def get_statistic(call: types.CallbackQuery):
 
     user_id = call.message.chat.id
 
-    send_msg = await Sendler_msg.send_msg_call(call, 'Начинаю получение данных. Ожидайте...', None)
+    send_msg = await Sendler_msg.send_msg_call(call, 'Начинаю получение данных. Примерно время ожидания 2 минуты. '
+                                                     'Ожидайте...', None)
 
     _msg = await GetDate(BotDB).get_statistic_msg()
 

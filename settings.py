@@ -6,6 +6,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), 'src', '.env'))
 
 ADMIN = ['1422194909']
 
+SEND_STATISTIC = ['1422194909']
+
 TOKEN = os.getenv('TOKEN')
 
 LOGO = r'src/telegram/media/logo.png'

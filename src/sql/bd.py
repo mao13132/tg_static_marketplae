@@ -86,17 +86,23 @@ class BotDB:
 
     def get_settings_by_key(self, key):
 
-        result = self.cursor.execute(f"SELECT value FROM settings "
-                                     f"WHERE key = '{key}'")
-
-        response = result.fetchall()
-
         try:
-            result = response[0][0]
-        except:
-            return False
 
-        return result
+            result = self.cursor.execute(f"SELECT value FROM settings "
+                                         f"WHERE key = '{key}'")
+
+            response = result.fetchall()
+
+            try:
+                result = response[0][0]
+            except:
+                return False
+
+            return result
+        except Exception as es:
+            print(f'Ошибка при попытке получить настройку "{key}" "{es}"')
+
+            return False
 
     def check_or_add_user(self, id_user, login):
 

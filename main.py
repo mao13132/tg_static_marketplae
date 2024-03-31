@@ -2,7 +2,7 @@ import asyncio
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from src.get_data.get_data_core import GetDate
+from src.scheduler.check_time import CheckTime
 from src.telegram.bot_core import *
 from src.telegram.callbacks.call_user import register_callbacks
 from src.telegram.handlers.users import register_user
@@ -23,11 +23,11 @@ def registration_calls(dp):
 
 async def main():
 
-    scheduler = AsyncIOScheduler()
-
     bot_start = Core()
 
-    # scheduler.add_job(GetDate(bot_start.BotDB).send_statistic, 'interval', seconds=1, misfire_grace_time=300)
+    scheduler = AsyncIOScheduler()
+
+    scheduler.add_job(CheckTime(bot_start).check_scheduler, 'interval', seconds=60, misfire_grace_time=300)
 
     registration_state(bot_start.dp)
     registration_all_handlers(bot_start.dp)
