@@ -25,6 +25,11 @@ NAME_BRAND = {
     9: 'Udnet Retail',
 }
 
+BRANDS_BY_DIRECTION = {
+    "Продукты питания": [NAME_BRAND[3], NAME_BRAND[4], NAME_BRAND[0]],
+    "Кресла": [NAME_BRAND[2], NAME_BRAND[9]],
+}
+
 OZON_API_KEY_LIST = {
     NAME_BRAND[0]: [os.getenv('CLIENT_ID1'), os.getenv('OZON_API_KEY1')],
     NAME_BRAND[1]: [os.getenv('CLIENT_ID2'), os.getenv('OZON_API_KEY2')],

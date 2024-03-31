@@ -33,7 +33,7 @@ class AllMarketByBrands:
 
         return True
 
-    async def start_sales_block(self):
+    async def start_brands_block(self):
         result = await self.iter_brands()
 
         return self.msg
