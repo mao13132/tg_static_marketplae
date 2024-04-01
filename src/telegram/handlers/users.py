@@ -10,6 +10,8 @@ from src.telegram.bot_core import BotDB
 
 
 async def start(message: Message):
+    await Sendler_msg.log_client_message(message)
+
     user_id = message.chat.id
 
     if str(user_id) not in ADMIN:

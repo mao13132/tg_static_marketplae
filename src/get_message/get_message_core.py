@@ -23,6 +23,8 @@ class GetMessageCore:
         self.analyst_day = settings['analyst_day']
 
     async def start_get_message(self):
+        print(f'\nНачинаю формировать сообщение с данными\n')
+
         total_block = await TotalBlock(self.settings).get_total_block()
 
         sales_block = await SalesBlock(self.settings).start_sales_block()
@@ -31,6 +33,7 @@ class GetMessageCore:
 
         tags_block = await TagsBlock(self.settings).start_tags_block()
 
-        main_msg = f'Данные от {self.target_day}\n\n{total_block}\n\n{sales_block}\n{brands_block}\n{tags_block}'
+        main_msg = f'<b>Данные от {self.target_day}</b>\n\n' \
+                   f'{total_block}\n\n{sales_block}\n{brands_block}\n{tags_block}'
 
         return main_msg

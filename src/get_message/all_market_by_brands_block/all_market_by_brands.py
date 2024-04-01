@@ -19,10 +19,11 @@ class AllMarketByBrands:
 
         self.analyst_day = settings['analyst_day']
 
-        self.msg = 'Общие по брендам:\n'
+        self.msg = '<b>Общие по брендам:</b>\n'
 
     async def iter_brands(self):
         for key, brand in NAME_BRAND.items():
+
             orders_now = self.BotDB.get_all_marketplace_by_brands(brand, self.target_day, 'order')
 
             orders_yesterday = self.BotDB.get_all_marketplace_by_brands(brand, self.analyst_day, 'order')

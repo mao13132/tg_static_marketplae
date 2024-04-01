@@ -7,6 +7,7 @@
 #
 # ---------------------------------------------
 from settings import NAME_BRAND, MARKETPLACE
+from src.get_message.filter_brand.filter_brand import filter_brand
 from src.get_message.formate_row import formate_row
 
 
@@ -19,10 +20,16 @@ class SalesBlock:
 
         self.analyst_day = settings['analyst_day']
 
-        self.msg = 'Заказы по брендам:\n'
+        self.msg = '<b>Заказы по брендам:</b>\n'
 
     async def iter_market_place(self, brand):
         for marketplace in MARKETPLACE:
+
+            stop_filter = filter_brand(marketplace, brand)
+
+            if stop_filter:
+                continue
+
             orders_now = self.BotDB.get_all_orders_by_brand(marketplace, brand, self.target_day, 'order')
 
             orders_yesterday = self.BotDB.get_all_orders_by_brand(marketplace, brand, self.analyst_day, 'order')

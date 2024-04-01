@@ -19,6 +19,8 @@ class WBApiCore:
 
         self.url_discount = f'https://discounts-prices-api.wb.ru/'
 
+        self.new_analitic_url = f'https://seller-analytics-api.wildberries.ru/'
+
         self.time_try = 15
 
         self.count_try = 10

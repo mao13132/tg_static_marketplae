@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), 'src', '.env'))
 
-ADMIN = ['1422194909']
+ADMIN = ['1422194909', '424814919', '1635185381']
 
-SEND_STATISTIC = ['1422194909']
+SEND_STATISTIC = ['1422194909', '424814919', '1635185381']
 
 TOKEN = os.getenv('TOKEN')
 
@@ -24,10 +24,33 @@ NAME_BRAND = {
     7: 'Little Dreams',
     8: 'Militon',
     5: 'iGGi',
-    1: 'CaptainOil',
     2: 'Ergonom Office',
     9: 'Udnet Retail',
 }
+
+STOP_BRAND_FILTER = [
+    {
+        'marketpalce': 'wb',
+        'brand': NAME_BRAND[4]
+    },
+    {
+        'marketpalce': 'wb',
+        'brand': NAME_BRAND[0]
+    },
+    {
+        'marketpalce': 'wb',
+        'brand': NAME_BRAND[8]
+    },
+    {
+        'marketpalce': 'wb',
+        'brand': NAME_BRAND[2]
+    },
+    {
+        'marketpalce': 'wb',
+        'brand': NAME_BRAND[9]
+    },
+
+]
 
 BRANDS_BY_DIRECTION = {
     "Продукты питания": [NAME_BRAND[3], NAME_BRAND[4], NAME_BRAND[0]],
@@ -36,7 +59,6 @@ BRANDS_BY_DIRECTION = {
 
 OZON_API_KEY_LIST = {
     NAME_BRAND[0]: [os.getenv('CLIENT_ID1'), os.getenv('OZON_API_KEY1')],
-    NAME_BRAND[1]: [os.getenv('CLIENT_ID2'), os.getenv('OZON_API_KEY2')],
     NAME_BRAND[2]: [os.getenv('CLIENT_ID3'), os.getenv('OZON_API_KEY3')],
     NAME_BRAND[3]: [os.getenv('CLIENT_ID4'), os.getenv('OZON_API_KEY4')],
     NAME_BRAND[4]: [os.getenv('CLIENT_ID5'), os.getenv('OZON_API_KEY5')],

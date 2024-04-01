@@ -6,11 +6,16 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
+
+import traceback
+import sys
+
 from src.get_data.ozon.ozon_get_orders import get_statistic_orders_ozon
 from src.get_data.ozon.ozon_get_sales import get_statistic_sales_ozon
 from src.get_data.wb.wb_get_product_and_orders import wb_get_product_and_orders
 from src.get_data.wb.wb_get_sales import wb_get_sales
 from src.get_message.get_message_core import GetMessageCore
+from src.logger._logger import logger_msg
 from src.utils.generate_date import minus_days
 
 
@@ -36,7 +41,11 @@ class GetDate:
         return True
 
     async def get_statistic_msg(self):
-        result_get_statistic = await self.get_data_from_marketplace()
+        try:
+            result_get_statistic = await self.get_data_from_marketplace()
+        except Exception as es:
+            await logger_msg(f"Ошибка при получение статистики {es}\n"
+                             f"{''.join(traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]))}")
 
         message_settings = {
             'BotDB': self.BotDB,
@@ -44,6 +53,13 @@ class GetDate:
             'analyst_day': self.analyst_day,
         }
 
-        _message = await GetMessageCore(message_settings).start_get_message()
+        try:
+            _message = await GetMessageCore(message_settings).start_get_message()
+        except Exception as es:
+
+            await logger_msg(f"Ошибка при формировании текста {es}\n"
+                             f"{''.join(traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]))}")
+
+            return 'Ошибка формирования статистики'
 
         return _message

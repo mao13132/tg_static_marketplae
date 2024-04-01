@@ -18,7 +18,7 @@ from src.logger._logger import logger_msg
 
 class WBApiOrders(WBApiCore):
     async def _get_orders(self, api_key, article_list, start_date):
-        url_get_img = self.url_content + f'content/v1/analytics/nm-report/detail/history'
+        url_get_img = self.new_analitic_url + f'api/v2/nm-report/detail/history'
 
         headers_price = {'Content-Type': 'application/json',
                          'Authorization': api_key
@@ -50,7 +50,7 @@ class WBApiOrders(WBApiCore):
                     return response
 
         except Exception as es:
-            await logger_msg(f'WB API Orders: Ошибка при получение заказов - пробую ещё "{es}"')
+            await logger_msg(f'WB отдаёт ошибку, ождаю и пробую ещё раз')
 
             return '-1'
 

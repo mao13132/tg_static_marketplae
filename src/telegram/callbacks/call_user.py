@@ -3,7 +3,6 @@ from aiogram.dispatcher import FSMContext
 
 from src.get_data.get_data_core import GetDate
 from src.logger._logger import logger_msg
-from src.telegram.handlers.users import start
 from src.telegram.sendler.sendler import *
 
 from src.telegram.bot_core import BotDB
@@ -17,7 +16,8 @@ async def get_statistic(call: types.CallbackQuery):
 
     user_id = call.message.chat.id
 
-    send_msg = await Sendler_msg.send_msg_call(call, 'Начинаю получение данных. Примерно время ожидания 2 минуты. '
+    send_msg = await Sendler_msg.send_msg_call(call, 'Начинаю получение данных. '
+                                                     '\n<b>Примерное время ожидания 2 минуты.</b> \n\n'
                                                      'Ожидайте...', None)
 
     _msg = await GetDate(BotDB).get_statistic_msg()
@@ -26,6 +26,8 @@ async def get_statistic(call: types.CallbackQuery):
         await call.message.bot.delete_message(user_id, send_msg.message_id)
     except:
         pass
+
+    print(_msg)
 
     try:
         await call.message.bot.send_message(user_id, _msg)
