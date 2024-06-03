@@ -6,7 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import NAME_BRAND, MARKETPLACE
+from settings import NAME_BRAND, MARKETPLACE, ACCESS
 from src.get_message.filter_brand.filter_brand import filter_brand
 from src.get_message.formate_row import formate_row
 
@@ -19,6 +19,10 @@ class SalesBlock:
         self.target_day = settings['target_day']
 
         self.analyst_day = settings['analyst_day']
+
+        self.user_id = settings['user_id']
+
+        self.security_brand = ACCESS[str(self.user_id)]
 
         self.msg = '<b>Заказы по брендам:</b>\n'
 
@@ -41,7 +45,7 @@ class SalesBlock:
         return True
 
     async def iter_brands(self):
-        for key, brand in NAME_BRAND.items():
+        for brand in self.security_brand:
             result = await self.iter_market_place(brand)
 
         return True

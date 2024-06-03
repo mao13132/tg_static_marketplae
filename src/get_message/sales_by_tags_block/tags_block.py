@@ -6,7 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import BRANDS_BY_DIRECTION
+from settings import BRANDS_BY_DIRECTION, ACCESS
 from src.get_message.formate_row import formate_row
 from src.get_message.sales_by_tags_block.generate_msg_by_tags import generate_msg_by_tags
 from src.logger._logger import logger_msg
@@ -21,9 +21,16 @@ class TagsBlock:
 
         self.analyst_day = settings['analyst_day']
 
+        self.user_id = settings['user_id']
+
+        self.security_brand = ACCESS[str(self.user_id)]
+
         self.data = {}
 
     async def plus_value(self, tags, _type, _value):
+        if not _value:
+            return False
+
         try:
             self.data[tags][_type] += _value
         except Exception as es:
@@ -55,8 +62,20 @@ class TagsBlock:
 
         return True
 
+    def check_security_brand(self, brand_list):
+        for brand in brand_list:
+            if brand not in self.security_brand:
+                return False
+
+        return True
+
     async def iter_tags(self):
         for tags, brand_list in BRANDS_BY_DIRECTION.items():
+
+            true_access = self.check_security_brand(brand_list)
+
+            if not true_access:
+                continue
 
             exist_tags = self.data.get(tags, False)
 
@@ -77,6 +96,9 @@ class TagsBlock:
 
     async def start_tags_block(self):
         result = await self.iter_tags()
+
+        if not result:
+            return ''
 
         message_tags = generate_msg_by_tags(self.data)
 

@@ -6,7 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import NAME_BRAND
+from settings import NAME_BRAND, ACCESS
 from src.get_message.formate_row import formate_row
 
 
@@ -19,10 +19,14 @@ class AllMarketByBrands:
 
         self.analyst_day = settings['analyst_day']
 
+        self.user_id = settings['user_id']
+
+        self.security_brand = ACCESS[str(self.user_id)]
+
         self.msg = '<b>Общие по брендам:</b>\n'
 
     async def iter_brands(self):
-        for key, brand in NAME_BRAND.items():
+        for brand in self.security_brand:
 
             orders_now = self.BotDB.get_all_marketplace_by_brands(brand, self.target_day, 'order')
 

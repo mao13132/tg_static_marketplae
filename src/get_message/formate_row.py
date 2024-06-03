@@ -13,7 +13,19 @@ async def formate_row(now_day, yesterday):
     try:
         count_yesterday, money_yesterday = yesterday
 
+        if count_yesterday is None:
+            count_yesterday = 0
+
+        if money_yesterday is None:
+            money_yesterday = 0
+
         count_now, money_now = now_day
+
+        if count_now is None:
+            count_now = 0
+
+        if money_now is None:
+            money_now = 0
 
         if money_now:
             money_now = round(money_now, 2)

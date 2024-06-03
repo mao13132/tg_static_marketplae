@@ -183,6 +183,27 @@ class BotDB:
 
         return response
 
+    def new_get_all_orders_by_marketplace(self, marketplace, day, _type, security_brand):
+        try:
+
+            sql_security = ", ".join(f"'{x}'" for x in security_brand)
+
+            result = self.cursor.execute(f"SELECT SUM(count), SUM(money) FROM statistic "
+                                         f"WHERE marketplace = '{marketplace}' AND "
+                                         f"date = '{day}' AND type = '{_type}' AND brand IN ({sql_security})")
+
+            response = result.fetchall()
+
+            response = response[0]
+
+
+        except Exception as es:
+            print(f'Ошибка SQL get_all_orders_by_marketplace: {es}')
+
+            return 0, 0
+
+        return response
+
     def get_all_orders_by_brand(self, marketplace, brand, day, _type):
         try:
 

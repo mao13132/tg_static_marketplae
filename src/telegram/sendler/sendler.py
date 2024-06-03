@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.types import Message
 from datetime import datetime
 from settings import *
+from src.logger._logger import logger_msg
 
 
 class Sendler_msg:
@@ -52,11 +53,11 @@ class Sendler_msg:
             try:
                 with open(LOGO, 'rb') as file:
                     msg = await call.message.bot.send_photo(call.message.chat.id, file, caption=(text_msg),
-                                                      reply_markup=keyb)
+                                                            reply_markup=keyb)
             except:
                 try:
                     msg = await call.message.bot.send_message(call.message.chat.id, text_msg,
-                                                        reply_markup=keyb)
+                                                              reply_markup=keyb)
 
                 except Exception as es:
                     print(f'Произошла ошибка при отправке поста текст: "{text_msg}" ошибка: "{es}"')
@@ -127,10 +128,8 @@ class Sendler_msg:
 
     async def log_client_call(call: types.CallbackQuery):
 
-        await call.bot.answer_callback_query(call.id)
-
-        print(f'\n{str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} '
-              f'"{call.message.chat.full_name}" Кликает по кнопке "{call.data}"\n')
+        await logger_msg(f'\n{str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} '
+                         f'"{call.message.chat.full_name}" Кликает по кнопке "{call.data}"\n')
         try:
             await call.bot.answer_callback_query(call.id)
         except Exception as es:
@@ -138,10 +137,8 @@ class Sendler_msg:
 
     async def log_client_message(message: Message):
 
-        print()
-        print(f'{str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} '
-              f'"{message.chat.full_name}" написал "{message.text}"')
-        print()
+        await logger_msg(f'\n{str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))} '
+                         f'"{message.chat.full_name}" написал "{message.text}"\n')
 
     async def sendler_photo_call(self, call, photo, text, keyb):
         try:
@@ -179,7 +176,7 @@ class Sendler_msg:
                 file_photo = types.InputMediaPhoto(file)
 
                 await call.message.edit_media(media=file_photo)
-                await call.message.edit_caption(caption=text, reply_markup=keyb,)
+                await call.message.edit_caption(caption=text, reply_markup=keyb, )
         except:
             try:
                 with open(photo, 'rb') as file:

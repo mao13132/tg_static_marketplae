@@ -7,7 +7,7 @@
 #
 # ---------------------------------------------
 def generate_msg_by_tags(data):
-    _msg = '<b>Общие по направлениям:</b>\n'
+    _msg = '<b>Общие по производствам:</b>\n'
 
     for tag, data_tag in data.items():
 

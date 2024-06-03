@@ -6,11 +6,13 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from datetime import datetime, timedelta, date
+from datetime import datetime
 
 from settings import SEND_STATISTIC
+from src.get_data._get_data import get_data_from_marketplace
 from src.get_data.get_data_core import GetDate
 from src.logger._logger import logger_msg
+from src.utils.generate_date import minus_days
 
 
 class CheckTime:
@@ -34,16 +36,18 @@ class CheckTime:
         if sql_time != now_time:
             return False
 
-        _msg = await GetDate(self.BotDB).get_statistic_msg()
+        get_data_from_db = await get_data_from_marketplace(self.BotDB, minus_days(1))
 
-        for admin in SEND_STATISTIC:
+        for manager in SEND_STATISTIC:
+
+            personal_msg = await GetDate(self.BotDB, manager).get_msg()
 
             try:
-                await self.bot_start.bot.send_message(int(admin), _msg)
+                await self.bot_start.bot.send_message(int(manager), personal_msg)
             except Exception as es:
-                _error = f'Не могу отправить статистику админу ({admin}) по расписанию "{es}"'
+                _error = f'Не могу отправить статистику менеджеру ({manager}) по расписанию "{es}"'
 
-                await logger_msg(_error, push=True)
+                await logger_msg(_error)
 
                 continue
 

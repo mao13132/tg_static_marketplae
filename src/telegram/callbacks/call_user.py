@@ -16,11 +16,14 @@ async def get_statistic(call: types.CallbackQuery):
 
     user_id = call.message.chat.id
 
+    if str(user_id) not in ADMIN and str(user_id) not in SEND_STATISTIC:
+        return False
+
     send_msg = await Sendler_msg.send_msg_call(call, 'Начинаю получение данных. '
                                                      '\n<b>Примерное время ожидания 2 минуты.</b> \n\n'
                                                      'Ожидайте...', None)
 
-    _msg = await GetDate(BotDB).get_statistic_msg()
+    _msg = await GetDate(BotDB, user_id).get_statistic_msg()
 
     try:
         await call.message.bot.delete_message(user_id, send_msg.message_id)
@@ -49,6 +52,11 @@ async def change_time(call: types.CallbackQuery):
     user_id = call.message.chat.id
 
     keyb = Admin_keyb().back()
+
+    if str(user_id) not in ADMIN:
+        await Sendler_msg.send_msg_call(call, '⚠️Отказано в доступе', keyb)
+
+        return False
 
     await Sendler_msg.send_msg_call(call, '⚠️Введите в какое время необходимо присылать отчёт\n'
                                           'Формат 11:00 или 11:11', keyb)
