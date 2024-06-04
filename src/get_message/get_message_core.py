@@ -7,7 +7,6 @@
 #
 # ---------------------------------------------
 from settings import ACCESS, ADMIN
-from src.get_message.all_market_by_brands_block.all_market_by_brands import AllMarketByBrands
 from src.get_message.sales_by_brands_block.sales_block import SalesBlock
 from src.get_message.sales_by_tags_block.tags_block import TagsBlock
 from src.get_message.total_block.total_block import TotalBlock
@@ -41,6 +40,5 @@ class GetMessageCore:
 
         main_msg = f'<b>Данные от {self.target_day}</b>\n\n' \
                    f'{total_block}\n\n{sales_block}\n{tags_block}'
-        # f'{total_block}\n\n{sales_block}\n{brands_block}\n{tags_block}'
 
         return main_msg

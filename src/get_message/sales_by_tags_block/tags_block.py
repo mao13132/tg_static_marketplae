@@ -6,10 +6,11 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import BRANDS_BY_DIRECTION, ACCESS
+from settings import BRANDS_BY_DIRECTION, ACCESS, TARGET_DAY, ANALYST_DAY
 from src.get_message.formate_row import formate_row
 from src.get_message.sales_by_tags_block.generate_msg_by_tags import generate_msg_by_tags
 from src.logger._logger import logger_msg
+from src.utils.generate_date import minus_days
 
 
 class TagsBlock:
@@ -27,6 +28,14 @@ class TagsBlock:
 
         self.data = {}
 
+        self.total_order = 0
+
+        self.total_money = 0
+
+        self.total_order_yesterday = 0
+
+        self.total_money_yesterday = 0
+
     async def plus_value(self, tags, _type, _value):
         if not _value:
             return False
@@ -41,10 +50,19 @@ class TagsBlock:
         return True
 
     async def iter_brands_list(self, brands_list, tags):
+
         for brand in brands_list:
             orders_now = self.BotDB.get_all_marketplace_by_brands(brand, self.target_day, 'order')
 
             orders_yesterday = self.BotDB.get_all_marketplace_by_brands(brand, self.analyst_day, 'order')
+
+            self.total_order += orders_now[0]
+
+            self.total_money += orders_now[1]
+
+            self.total_order_yesterday += orders_yesterday[0]
+
+            self.total_money_yesterday += orders_yesterday[1]
 
             await self.plus_value(tags, 'total_orders', orders_now[0])
 
@@ -70,6 +88,16 @@ class TagsBlock:
         return True
 
     async def iter_tags(self):
+        self.data = {}
+
+        self.total_order = 0
+
+        self.total_money = 0
+
+        self.total_order_yesterday = 0
+
+        self.total_money_yesterday = 0
+
         for tags, brand_list in BRANDS_BY_DIRECTION.items():
 
             true_access = self.check_security_brand(brand_list)
@@ -92,14 +120,17 @@ class TagsBlock:
 
             res = await self.iter_brands_list(brand_list, tags)
 
-        return True
+        return self.data
 
     async def start_tags_block(self):
-        result = await self.iter_tags()
+        data_one = await self.iter_tags()
 
-        if not result:
+        if not data_one:
             return ''
 
-        message_tags = generate_msg_by_tags(self.data)
+        total_data_row_text = await formate_row((self.total_order, self.total_money),
+                                                (self.total_order_yesterday, self.total_money_yesterday))
+
+        message_tags = generate_msg_by_tags(data_one, total_data_row_text)
 
         return message_tags
