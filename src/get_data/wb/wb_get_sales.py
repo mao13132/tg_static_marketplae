@@ -8,6 +8,7 @@
 # ---------------------------------------------
 from settings import WB_API_KEY_LIST
 from src.api.wb.wb_api_sales import WBApiSales
+from src.get_message.filter_brand.filter_brand import filter_brand
 from src.logger._logger import logger_msg
 
 
@@ -19,6 +20,11 @@ async def wb_get_sales(BotDB, target_day):
     is_good = True
 
     for brand, security in WB_API_KEY_LIST.items():
+
+        access_false = filter_brand('wb', brand)
+
+        if access_false:
+            continue
 
         print(f'Начинаю получать продажи с {brand}')
 

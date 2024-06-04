@@ -11,9 +11,11 @@ from src.get_data.ozon.ozon_get_orders import get_statistic_orders_ozon
 from src.get_data.ozon.ozon_get_sales import get_statistic_sales_ozon
 from src.get_data.wb.wb_get_product_and_orders import wb_get_product_and_orders
 from src.get_data.wb.wb_get_sales import wb_get_sales
+from src.get_message.filter_brand.filter_brand import filter_brand
 
 
 async def get_data_from_marketplace(BotDB, target_day):
+
     res_orders_ozon = await get_statistic_orders_ozon(BotDB, target_day)
 
     res_sales_wb = await wb_get_sales(BotDB, target_day)

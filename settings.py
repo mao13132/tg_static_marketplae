@@ -24,7 +24,7 @@ NAME_BRAND = {
     0: 'Benerich',
     7: 'Little Dreams',
     8: 'Militon',
-    6: 'Kronly',
+    6: 'Kronly',    # это ФДИ
     10: 'Spets',
 }
 
@@ -67,7 +67,7 @@ OZON_API_KEY_LIST = {
 
 WB_API_KEY_LIST = {
     NAME_BRAND[3]: [os.getenv('api_key'), os.getenv('api_key2')],
-    NAME_BRAND[6]: [os.getenv('api_key_po'), os.getenv('api_key_po2')],
+    NAME_BRAND[6]: [os.getenv('api_key_fdi'), os.getenv('api_key_fdi2')],
     NAME_BRAND[7]: [os.getenv('api_key_shelepina'), os.getenv('api_key_shelepina2')],
     NAME_BRAND[10]: [os.getenv('api_key_spets'), os.getenv('api_key_spets2')],
 }

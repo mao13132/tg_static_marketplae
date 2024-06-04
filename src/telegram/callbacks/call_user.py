@@ -1,8 +1,10 @@
+import asyncio
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 
 from src.get_data.get_data_core import GetDate
 from src.logger._logger import logger_msg
+from src.telegram.logic.write import Write
 from src.telegram.sendler.sendler import *
 
 from src.telegram.bot_core import BotDB
@@ -23,7 +25,19 @@ async def get_statistic(call: types.CallbackQuery):
                                                      '\n<b>Примерное время ожидания 2 минуты.</b> \n\n'
                                                      'Ожидайте...', None)
 
-    _msg = await GetDate(BotDB, user_id).get_statistic_msg()
+    _write = Write()
+
+    writing = asyncio.create_task(_write.write(call.message))
+
+    # _msg = await GetDate(BotDB, user_id).get_statistic_msg()
+
+    _msg = asyncio.create_task(GetDate(BotDB, user_id).get_statistic_msg(_write))
+
+    await _msg
+
+    _msg = _msg.result()
+
+    await writing
 
     try:
         await call.message.bot.delete_message(user_id, send_msg.message_id)

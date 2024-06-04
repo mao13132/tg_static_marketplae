@@ -8,6 +8,7 @@
 # ---------------------------------------------
 from settings import OZON_API_KEY_LIST
 from src.api.ozon.ozon_api_orders_profit import OzonApiOrdersProfit
+from src.get_message.filter_brand.filter_brand import filter_brand
 from src.logger._logger import logger_msg
 
 
@@ -19,6 +20,11 @@ async def get_statistic_orders_ozon(BotDB, target_day):
     is_good = True
 
     for brand, security in OZON_API_KEY_LIST.items():
+
+        access_false = filter_brand('ozon', brand)
+
+        if access_false:
+            continue
 
         data_statistic = await ozon_core.loop_get_orders_profit(
             'TG BOT', security, target_day, target_day)

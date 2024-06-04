@@ -45,14 +45,23 @@ class GetDate:
 
         return _message
 
-    async def get_statistic_msg(self):
+    async def get_statistic_msg(self, _write=False):
         try:
             result_get_statistic = await get_data_from_marketplace(self.BotDB, self.target_day)
         except Exception as es:
+
+            if _write:
+                _write.status = False
+
             await logger_msg(
                 f"Ошибка при получение статистики {es}\n"
                 f"{''.join(traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]))}")
 
+            return 'Ошибка получения данных'
+
         _message = await self.get_msg()
+
+        if _write:
+            _write.status = False
 
         return _message
