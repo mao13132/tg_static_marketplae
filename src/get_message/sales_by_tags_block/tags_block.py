@@ -10,7 +10,6 @@ from settings import BRANDS_BY_DIRECTION, ACCESS, TARGET_DAY, ANALYST_DAY
 from src.get_message.formate_row import formate_row
 from src.get_message.sales_by_tags_block.generate_msg_by_tags import generate_msg_by_tags
 from src.logger._logger import logger_msg
-from src.utils.generate_date import minus_days
 
 
 class TagsBlock:
@@ -54,23 +53,59 @@ class TagsBlock:
         for brand in brands_list:
             orders_now = self.BotDB.get_all_marketplace_by_brands(brand, self.target_day, 'order')
 
+            orders_now_count = orders_now[0]
+
+            orders_now_money = orders_now[1]
+
             orders_yesterday = self.BotDB.get_all_marketplace_by_brands(brand, self.analyst_day, 'order')
 
-            self.total_order += orders_now[0]
+            orders_yesterday_count = orders_yesterday[0]
 
-            self.total_money += orders_now[1]
+            orders_yesterday_money = orders_yesterday[1]
 
-            self.total_order_yesterday += orders_yesterday[0]
+            if orders_yesterday_count is None:
+                orders_yesterday_count = 0
 
-            self.total_money_yesterday += orders_yesterday[1]
+                message = f'Tags_block: нет данных за позавчерашний день "{brand}" по кол-ву заказов'
 
-            await self.plus_value(tags, 'total_orders', orders_now[0])
+                await logger_msg(message, push=True)
 
-            await self.plus_value(tags, 'total_money', orders_now[1])
+            if orders_yesterday_money is None:
+                orders_yesterday_money = 0
 
-            await self.plus_value(tags, 'total_orders_yesterday', orders_yesterday[0])
+                message = f'Tags_block: нет данных за позавчерашний день "{brand}" по сумме заказов'
 
-            await self.plus_value(tags, 'total_money_yesterday', orders_yesterday[1])
+                await logger_msg(message, push=True)
+
+            if orders_now_count is None:
+                orders_now_count = 0
+
+                message = f'Tags_block: нет данных за вчерашний день "{brand}" по кол-ву заказов'
+
+                await logger_msg(message, push=True)
+
+            if orders_now_money is None:
+                orders_now_money = 0
+
+                message = f'Tags_block: нет данных за вчерашний день "{brand}" по сумме заказов'
+
+                await logger_msg(message, push=True)
+
+            self.total_order += orders_now_count
+
+            self.total_money += orders_now_money
+
+            self.total_order_yesterday += orders_yesterday_count
+
+            self.total_money_yesterday += orders_yesterday_money
+
+            await self.plus_value(tags, 'total_orders', orders_now_count)
+
+            await self.plus_value(tags, 'total_money', orders_now_money)
+
+            await self.plus_value(tags, 'total_orders_yesterday', orders_yesterday_count)
+
+            await self.plus_value(tags, 'total_money_yesterday', orders_yesterday_money)
 
         data_row_text = await formate_row(
             (self.data[tags]['total_orders'], self.data[tags]['total_money']),
