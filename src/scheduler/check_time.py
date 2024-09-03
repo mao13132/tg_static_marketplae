@@ -12,6 +12,7 @@ from settings import SEND_STATISTIC
 from src.get_data._get_data import get_data_from_marketplace
 from src.get_data.get_data_core import GetDate
 from src.logger._logger import logger_msg
+from src.logger.logger_no_sync import logger_no_sync
 from src.telegram.pinned_msg.pinned_msg import pinned_msg
 from src.utils.generate_date import minus_days
 from src.week_statistic.get_message_week.core_get_msg_week import core_get_msg_week
@@ -84,6 +85,8 @@ class CheckTime:
 
         # Меняю статус на оправлено у sql строчек по week статистики
         if ids_sql:
+            logger_no_sync(f'Отключаю: "{ids_sql}"')
+
             over_week_row_sql = [self.BotDB.over_week_row(row) for row in ids_sql]
 
         return True
