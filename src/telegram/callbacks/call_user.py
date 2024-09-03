@@ -3,14 +3,15 @@ from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
 
 from src.get_data.get_data_core import GetDate
-from src.logger._logger import logger_msg
 from src.telegram.logic.write import Write
+from src.telegram.pinned_msg.pinned_msg import pinned_msg
 from src.telegram.sendler.sendler import *
 
 from src.telegram.bot_core import BotDB
 
 from src.telegram.keyboard.keyboards import *
 from src.telegram.state.states import States
+from src.week_statistic.get_week_data.get_data_core_week import GetDateWeek
 
 
 async def get_statistic(call: types.CallbackQuery):
@@ -29,8 +30,6 @@ async def get_statistic(call: types.CallbackQuery):
 
     writing = asyncio.create_task(_write.write(call.message))
 
-    # _msg = await GetDate(BotDB, user_id).get_statistic_msg()
-
     _msg = asyncio.create_task(GetDate(BotDB, user_id).get_statistic_msg(_write))
 
     await _msg
@@ -44,10 +43,8 @@ async def get_statistic(call: types.CallbackQuery):
     except:
         pass
 
-    print(_msg)
-
     try:
-        await call.message.bot.send_message(user_id, _msg)
+        msg_send = await call.message.bot.send_message(user_id, _msg)
     except Exception as es:
         error_ = f'Ошибка при отправке статистики "{es}"'
 
@@ -56,6 +53,27 @@ async def get_statistic(call: types.CallbackQuery):
         await call.message.bot.send_message(user_id, error_)
 
         return False
+
+    await pinned_msg(call.message.bot, user_id, msg_send)
+
+    ##################### WEEK STATISTIC ####################
+
+    week_static = await asyncio.create_task(GetDateWeek(BotDB, user_id).get_statistic_msg_week())
+
+    if week_static:
+
+        try:
+            week_send = await call.message.bot.send_message(user_id, week_static)
+        except Exception as es:
+            error_ = f'Ошибка при отправке week статистики "{es}"'
+
+            await logger_msg(error_, push=True)
+
+            await call.message.bot.send_message(user_id, error_)
+
+            return False
+
+        await pinned_msg(call.message.bot, user_id, week_send)
 
     return True
 

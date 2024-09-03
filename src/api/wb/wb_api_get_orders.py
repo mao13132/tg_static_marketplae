@@ -82,7 +82,7 @@ class WBApiOrders(WBApiCore):
             data_response = await self._get_orders(api_key, article_list, start_date)
 
             if data_response == '-1':
-                time.sleep(self.time_try)
+                time.sleep(60)
 
                 continue
 
@@ -92,7 +92,7 @@ class WBApiOrders(WBApiCore):
             is_error = await self.check_error(data_response, brand)
 
             if is_error == '-1':
-                time.sleep(self.time_try)
+                time.sleep(60)
 
                 continue
 

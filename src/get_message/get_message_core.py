@@ -27,10 +27,12 @@ class GetMessageCore:
     async def start_get_message(self):
         print(f'\nНачинаю формировать сообщение с данными\n')
 
-        if str(self.user_id) in ADMIN:
-            total_block = await TotalBlock(self.settings).get_total_block_from_admin()
-        else:
-            total_block = await TotalBlock(self.settings).get_total_block()
+        # if str(self.user_id) in ADMIN:
+        #     total_block = await TotalBlock(self.settings).get_total_block_from_admin()
+        # else:
+        #     total_block = await TotalBlock(self.settings).get_total_block()
+
+        total_block = await TotalBlock(self.settings).get_total_block()
 
         sales_block = await SalesBlock(self.settings).start_sales_block()
 

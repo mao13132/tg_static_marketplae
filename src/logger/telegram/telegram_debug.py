@@ -17,7 +17,7 @@ class Telegram:
 
     async def send_message(self, text):
         url_req = "https://api.telegram.org/bot" + self.TOKEN + "/sendMessage" + "?chat_id=" + \
-                  self.ADMIN_TELEGRAM + "&text=" + text
+                  self.ADMIN_TELEGRAM + "&text=tg_stat_market" + text
 
         try:
 

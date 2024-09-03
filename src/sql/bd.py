@@ -2,6 +2,8 @@ import datetime
 import sqlite3
 from datetime import datetime
 
+import asyncio
+
 from src.logger._logger import logger_msg
 
 
@@ -58,6 +60,21 @@ class BotDB:
                                 f"settings (id_pk INTEGER PRIMARY KEY AUTOINCREMENT, "
                                 f"key TEXT, "
                                 f"value TEX)")
+
+        except Exception as es:
+            print(f'SQL исключение settings {es}')
+
+        try:
+            self.cursor.execute(f"CREATE TABLE IF NOT EXISTS "
+                                f"week_statistic (id_pk INTEGER PRIMARY KEY AUTOINCREMENT, "
+                                f"marketplace TEXT, "
+                                f"number_report TEXT, "
+                                f"brand TEXT, "
+                                f"start_date TEXT, "
+                                f"end_date TEXT, "
+                                f"sellers NUMBER, "
+                                f"profit NUMBER, "
+                                f"status_send BOOLEAN DEFAULT 0)")
 
         except Exception as es:
             print(f'SQL исключение settings {es}')
@@ -158,7 +175,6 @@ class BotDB:
             return True
 
         except Exception as es:
-            import asyncio
 
             asyncio.run(logger_msg(f'Ошибка сохранения в базу данных "{es}"'))
 
@@ -245,6 +261,76 @@ class BotDB:
             return 0, 0
 
         return response
+
+    def check_or_add_week(self, number_report, marketplace, brand, start_date, end_date, sellers, profit):
+
+        result = self.cursor.execute(f"SELECT * FROM week_statistic WHERE number_report='{number_report}'")
+
+        response = result.fetchall()
+
+        if not response:
+            self.cursor.execute("INSERT OR IGNORE INTO week_statistic ('number_report', 'marketplace', 'brand',"
+                                "'start_date', 'end_date', 'sellers', 'profit') VALUES (?,?,?,?,?,?,?)",
+                                (number_report, marketplace, brand, start_date, end_date, sellers, profit))
+
+            self.conn.commit()
+
+            return True
+
+        return False
+
+    def get_week_data(self, brand, marketplace, start_date_week, end_date_week):
+        try:
+            if start_date_week:
+                result = self.cursor.execute(f"SELECT * FROM week_statistic "
+                                             f"WHERE brand = '{brand}' AND "
+                                             f"marketplace = '{marketplace}' AND status_send = '0' "
+                                             f"AND start_date = '{start_date_week}' AND end_date = '{end_date_week}'")
+            else:
+
+                result = self.cursor.execute(f"SELECT * FROM week_statistic "
+                                             f"WHERE brand = '{brand}' AND "
+                                             f"marketplace = '{marketplace}' AND status_send = '0'")
+
+            response = result.fetchall()
+
+            response = response[0]
+        except:
+            return []
+
+        return response
+
+    def get_week_old_data(self, brand, marketplace, end_date):
+        try:
+
+            result = self.cursor.execute(f"SELECT * FROM week_statistic "
+                                         f"WHERE brand = '{brand}' AND "
+                                         f"marketplace = '{marketplace}' AND end_date = '{end_date}'")
+
+            response = result.fetchall()
+
+            response = response[0]
+
+        except Exception as es:
+            print(f'Ошибка SQL get_week_old_data: {es}')
+
+            return []
+
+        return response
+
+    def over_week_row(self, id_pk):
+        try:
+            self.cursor.execute(f"UPDATE week_statistic SET status_send = '1' WHERE id_pk = '{id_pk}'")
+
+            self.conn.commit()
+        except Exception as es:
+            error_ = f'SQL ошибка при over_week_row "{es}"'
+
+            asyncio.run(logger_msg(error_))
+
+            return False
+
+        return True
 
     def close(self):
         self.conn.close()
