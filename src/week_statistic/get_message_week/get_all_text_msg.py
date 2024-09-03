@@ -7,6 +7,7 @@
 #
 # ---------------------------------------------
 from src.week_statistic.get_message_week._formate_row import formate_row_week
+from src.week_statistic.get_message_week._search_category_name import search_category_name
 
 
 async def get_all_text_msg(data_week):
@@ -26,7 +27,9 @@ async def get_all_text_msg(data_week):
         if not text_row:
             continue
 
-        _msg += f'{brand}: {text_row}\n'
+        category_name = await search_category_name(brand)
+
+        _msg += f'{category_name}: {text_row}\n'
 
         continue
 

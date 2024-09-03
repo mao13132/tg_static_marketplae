@@ -10,7 +10,6 @@ from src.logger.logger_no_sync import logger_no_sync
 from src.logger.telegram.telegram_debug_no_sync import SendlerOneCreate
 
 
-
 async def formate_row_week(data_brand):
     try:
         money = data_brand['money']
@@ -21,9 +20,11 @@ async def formate_row_week(data_brand):
 
         old_sellers = data_brand['old_sellers']
 
-        percent_sellers = round(sellers / (old_sellers / 100), 2)
+        # percent_sellers = round(sellers / (old_sellers / 100), 2)
+        percent_sellers = round((sellers - old_sellers) / (old_sellers / 100), 2)
 
-        percent_money = round(money / (old_money / 100), 2)
+        # percent_money = round(money / (old_money / 100), 2)
+        percent_money = round((money - old_money) / (old_money / 100), 2)
 
         icon_count = '🔻' if percent_sellers < 0 else '🔝'
 
