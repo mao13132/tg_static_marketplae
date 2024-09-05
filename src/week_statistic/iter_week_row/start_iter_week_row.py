@@ -20,9 +20,15 @@ class StartIterWeekRow:
 
     async def start_iter_week_row(self):
         for count_row, row in enumerate(self.data_week[1:]):
+            if not row:
+                continue
+
             idx_numbers = self.idx_title['idx_numbers']
 
             number_report = row[idx_numbers]
+
+            if not number_report:
+                continue
 
             marketplace = self.data_sheet['market_place']
 

@@ -7,6 +7,7 @@
 #
 # ---------------------------------------------
 from settings import SOURCE_SHEETS
+from src.logger.logger_no_sync import logger_no_sync
 from src.week_statistic.get_week_data._get_rows_from_sheet import get_rows_from_sheet
 from src.week_statistic.iter_week_row.start_iter_week_row import StartIterWeekRow
 
@@ -31,8 +32,14 @@ class StartGetWeekData:
                 'BotDB': self.BotDB,
                 'data_sheet': data_sheet,
             }
+            try:
+                res_write = await StartIterWeekRow(settings_write).start_iter_week_row()
+            except Exception as es:
+                error_ = f'Ошибка при формирование week статистики "{data_sheet}" "{es}"'
 
-            res_write = await StartIterWeekRow(settings_write).start_iter_week_row()
+                logger_no_sync(error_)
+
+                continue
 
             continue
 
