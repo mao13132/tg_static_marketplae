@@ -294,11 +294,25 @@ class BotDB:
 
             response = result.fetchall()
 
-            response = response[0]
+            # response = response[0]
         except:
             return []
 
         return response
+
+    def get_new_week_row(self):
+        try:
+            result = self.cursor.execute(f"SELECT id_pk FROM week_statistic "
+                                         f"WHERE status_send = '0'")
+
+            response = result.fetchall()
+
+            id_list = [x[0] for x in response]
+
+        except:
+            return []
+
+        return id_list
 
     def get_week_old_data(self, brand, marketplace, end_date):
         try:

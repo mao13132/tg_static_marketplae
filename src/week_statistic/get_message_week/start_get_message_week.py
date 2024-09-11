@@ -45,52 +45,54 @@ class StartGetMessageWeek:
             if current_brand not in access_brand_list:
                 continue
 
-            week_data_row = self.BotDB.get_week_data(current_brand, marketplace, start_date_week, end_date_week)
+            week_data_row_list = self.BotDB.get_week_data(current_brand, marketplace, start_date_week, end_date_week)
 
-            if not week_data_row:
+            if not week_data_row_list:
                 continue
 
-            pk_id_sql.append(week_data_row[0])
+            for week_data_row in week_data_row_list:
 
-            # Устанавливаю дату, что бы собрать только за этот период
-            start_date_week = week_data_row[4]
+                pk_id_sql.append(week_data_row[0])
 
-            end_date_week = week_data_row[5]
+                # Устанавливаю дату, что бы собрать только за этот период
+                start_date_week = week_data_row[4]
 
-            date_minus_day = minus_days_week(start_date_week)
+                end_date_week = week_data_row[5]
 
-            old_week_data_row = self.BotDB.get_week_old_data(current_brand, marketplace, date_minus_day)
+                date_minus_day = minus_days_week(start_date_week)
 
-            if not old_week_data_row:
-                error_ = f'Нет старых данных для "{marketplace}" "{current_brand}" за "{date_minus_day}"'
+                old_week_data_row = self.BotDB.get_week_old_data(current_brand, marketplace, date_minus_day)
 
-                logger_no_sync(error_)
+                if not old_week_data_row:
+                    error_ = f'Нет старых данных для "{marketplace}" "{current_brand}" за "{date_minus_day}"'
 
-                SendlerOneCreate('').save_text(error_)
+                    logger_no_sync(error_)
+
+                    SendlerOneCreate('').save_text(error_)
+
+                    continue
+
+                exists = self.data.get(current_brand, False)
+
+                if not exists:
+                    self.data[current_brand] = {
+                        'sellers': 0,
+                        'money': 0,
+                        'old_sellers': 0,
+                        'old_money': 0,
+                        'start_date': start_date_week,
+                        'end_date': end_date_week,
+                    }
+
+                self.data[current_brand]['sellers'] += week_data_row[6]
+
+                self.data[current_brand]['money'] += await clear_float(week_data_row[7])
+
+                self.data[current_brand]['old_sellers'] += old_week_data_row[6]
+
+                self.data[current_brand]['old_money'] += await clear_float(old_week_data_row[7])
 
                 continue
-
-            exists = self.data.get(current_brand, False)
-
-            if not exists:
-                self.data[current_brand] = {
-                    'sellers': 0,
-                    'money': 0,
-                    'old_sellers': 0,
-                    'old_money': 0,
-                    'start_date': start_date_week,
-                    'end_date': end_date_week,
-                }
-
-            self.data[current_brand]['sellers'] += week_data_row[6]
-
-            self.data[current_brand]['money'] += await clear_float(week_data_row[7])
-
-            self.data[current_brand]['old_sellers'] += old_week_data_row[6]
-
-            self.data[current_brand]['old_money'] += await clear_float(old_week_data_row[7])
-
-            continue
 
         if pk_id_sql:
             self.data['ids'] = pk_id_sql

@@ -45,8 +45,6 @@ class CheckTime:
         # Получаю недельную статистику из таблиц
         get_week_data_from_sheet = await StartGetWeekData({'BotDB': self.BotDB}).start_get_week()
 
-        ids_sql = []
-
         for manager in SEND_STATISTIC:
 
             personal_msg = await GetDate(self.BotDB, manager).get_msg()
@@ -68,8 +66,6 @@ class CheckTime:
             if not message_week:
                 continue
 
-            ids_sql = message_week['ids']
-
             message_week = message_week['msg']
 
             try:
@@ -83,10 +79,14 @@ class CheckTime:
 
             await pinned_msg(self.bot_start.bot, manager, week_msg)
 
-        # Меняю статус на оправлено у sql строчек по week статистики
-        if ids_sql:
-            logger_no_sync(f'Отключаю: "{ids_sql}"')
+        print(f'Разослал всем пользователям информацию')
 
-            over_week_row_sql = [self.BotDB.over_week_row(row) for row in ids_sql]
+        sql_week_id = self.BotDB.get_new_week_row()
+
+        # Меняю статус на оправлено у sql строчек по week статистики
+        if sql_week_id:
+            logger_no_sync(f'Отключаю: "{sql_week_id}"')
+
+            over_week_row_sql = [self.BotDB.over_week_row(row) for row in sql_week_id]
 
         return True
