@@ -34,11 +34,11 @@ class GetIdxColumnsWeek:
 
         self.column_deductions = 'Прочие удержания = Удержания'
 
-        self.column_cash_back_ship = 'Возмещение издержек по перевозке/по складским операциям с товаром'
+        # self.column_cash_back_ship = 'Возмещение издержек по перевозке/по складским операциям с товаром'
 
         self.column_summa_from_pay = 'Итого к оплате'
 
-        self.column_ads = 'Реклама по апи'
+        # self.column_ads = 'Реклама по апи'
 
         self.column_material_cost = 'Материальная себестоимость'
 
@@ -118,20 +118,20 @@ class GetIdxColumnsWeek:
         if str(idx_deductions) == 'False':
             return False
 
-        idx_cash_back_ship = self._get_idx_columns(self.column_cash_back_ship)
-
-        if str(idx_cash_back_ship) == 'False':
-            return False
+        # idx_cash_back_ship = self._get_idx_columns(self.column_cash_back_ship)
+        #
+        # if str(idx_cash_back_ship) == 'False':
+        #     return False
 
         idx_summa_from_pay = self._get_idx_columns(self.column_summa_from_pay)
 
         if str(idx_summa_from_pay) == 'False':
             return False
 
-        idx_column_ads = self._get_idx_columns(self.column_ads)
-
-        if str(idx_column_ads) == 'False':
-            return False
+        # idx_column_ads = self._get_idx_columns(self.column_ads)
+        #
+        # if str(idx_column_ads) == 'False':
+        #     return False
 
         idx_material_cost = self._get_idx_columns(self.column_material_cost)
 
@@ -155,9 +155,9 @@ class GetIdxColumnsWeek:
             'idx_storage': idx_storage,
             'idx_paid': idx_paid,
             'idx_deductions': idx_deductions,
-            'idx_cash_back_ship': idx_cash_back_ship,
+            # 'idx_cash_back_ship': idx_cash_back_ship,
             'idx_summa_from_pay': idx_summa_from_pay,
-            'idx_column_ads': idx_column_ads,
+            # 'idx_column_ads': idx_column_ads,
             'idx_material_cost': idx_material_cost,
             'idx_total_profit': idx_total_profit,
         }

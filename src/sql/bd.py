@@ -325,9 +325,7 @@ class BotDB:
 
             response = response[0]
 
-        except Exception as es:
-            print(f'Ошибка SQL get_week_old_data: {es}')
-
+        except:
             return []
 
         return response

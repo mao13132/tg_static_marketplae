@@ -57,7 +57,13 @@ class StartGetMessageWeek:
                 # Устанавливаю дату, что бы собрать только за этот период
                 start_date_week = week_data_row[4]
 
+                if not start_date_week:
+                    continue
+
                 end_date_week = week_data_row[5]
+
+                if not end_date_week:
+                    continue
 
                 date_minus_day = minus_days_week(start_date_week)
 
