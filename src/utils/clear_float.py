@@ -40,3 +40,24 @@ async def clear_float(value):
         return 0
 
     return good_value
+
+
+async def clear_int(value):
+    good_value = ''
+
+    for word in str(value):
+        if word.isdigit():
+            good_value += word
+
+    try:
+        good_value = int(good_value)
+    except Exception as es:
+        error_ = f'Не могу конвертировать значение "{value}" в int из sheet в float "{es}"'
+
+        logger_no_sync(error_)
+
+        SendlerOneCreate('').save_text(error_)
+
+        return 0
+
+    return good_value

@@ -9,7 +9,7 @@
 from settings import ACCESS, SOURCE_SHEETS
 from src.logger.logger_no_sync import logger_no_sync
 from src.logger.telegram.telegram_debug_no_sync import SendlerOneCreate
-from src.utils.clear_float import clear_float
+from src.utils.clear_float import clear_float, clear_int
 from src.utils.generate_date import minus_days_week
 
 
@@ -90,11 +90,11 @@ class StartGetMessageWeek:
                         'end_date': end_date_week,
                     }
 
-                self.data[current_brand]['sellers'] += week_data_row[6]
+                self.data[current_brand]['sellers'] += await clear_int(week_data_row[6])
 
                 self.data[current_brand]['money'] += await clear_float(week_data_row[7])
 
-                self.data[current_brand]['old_sellers'] += old_week_data_row[6]
+                self.data[current_brand]['old_sellers'] += await clear_int(old_week_data_row[6])
 
                 self.data[current_brand]['old_money'] += await clear_float(old_week_data_row[7])
 
