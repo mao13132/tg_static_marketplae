@@ -20,6 +20,11 @@ async def clear_float(value):
 
             continue
 
+        if word == '.':
+            good_value += word
+
+            continue
+
         if word == '-':
             good_value += word
 
