@@ -35,6 +35,8 @@ class TagsBlock:
 
         self.total_money_yesterday = 0
 
+        self.access_user_brands = []
+
     async def plus_value(self, tags, _type, _value):
         if not _value:
             return False
@@ -140,6 +142,10 @@ class TagsBlock:
             if not true_access:
                 continue
 
+            self.access_user_brands.extend(brand_list)
+
+            maximal = self.BotDB.maximal_orders_all_brand_by_day('order', brand_list)
+
             exist_tags = self.data.get(tags, False)
 
             if not exist_tags:
@@ -153,6 +159,8 @@ class TagsBlock:
 
                 self.data[tags]['total_money_yesterday'] = 0
 
+                self.data[tags]['maximal'] = maximal
+
             res = await self.iter_brands_list(brand_list, tags)
 
         return self.data
@@ -165,6 +173,12 @@ class TagsBlock:
 
         total_data_row_text = await formate_row((self.total_order, self.total_money),
                                                 (self.total_order_yesterday, self.total_money_yesterday))
+
+        maximal_total = self.BotDB.maximal_orders_all_brand_by_day('order', self.access_user_brands)
+
+        if maximal_total and self.total_order and self.total_money:
+            if self.total_order > maximal_total[0] or self.total_money > maximal_total[1]:
+                total_data_row_text = f"{total_data_row_text} 🍾🟢"
 
         message_tags = generate_msg_by_tags(data_one, total_data_row_text)
 

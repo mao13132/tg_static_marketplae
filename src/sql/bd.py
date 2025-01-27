@@ -212,9 +212,69 @@ class BotDB:
 
             response = response[0]
 
-
         except Exception as es:
             print(f'Ошибка SQL get_all_orders_by_marketplace: {es}')
+
+            return 0, 0
+
+        return response
+
+    def maximal_orders_all_brand_by_day(self, _type, security_brand):
+        try:
+            sql_security = ", ".join(f"'{x}'" for x in security_brand)
+
+            # поиск максимальных сумм по дням
+            result = self.cursor.execute(f"""
+                SELECT MAX(SUM_COUNT) AS max_count, MAX(SUM_MONEY) AS max_money
+                FROM (
+                    SELECT date, SUM(count) AS SUM_COUNT, SUM(money) AS SUM_MONEY
+                    FROM statistic
+                    WHERE type = '{_type}' 
+                      AND brand IN ({sql_security})
+                    GROUP BY date
+                ) AS subquery
+            """)
+
+            response = result.fetchall()
+
+            try:
+                response = response[0]
+            except:
+                return 0, 0
+
+        except Exception as es:
+            print(f'Ошибка SQL maximal_orders_all_marketplaces_by_day: {es}')
+
+            return 0, 0
+
+        return response
+
+    def maximal_orders_all_marketplaces_by_day(self, marketplace, _type, security_brand):
+        try:
+            sql_security = ", ".join(f"'{x}'" for x in security_brand)
+
+            # поиск максимальных сумм по дням
+            result = self.cursor.execute(f"""
+                SELECT MAX(SUM_COUNT) AS max_count, MAX(SUM_MONEY) AS max_money
+                FROM (
+                    SELECT date, SUM(count) AS SUM_COUNT, SUM(money) AS SUM_MONEY
+                    FROM statistic
+                    WHERE marketplace = '{marketplace}' 
+                      AND type = '{_type}' 
+                      AND brand IN ({sql_security})
+                    GROUP BY date
+                ) AS subquery
+            """)
+
+            response = result.fetchall()
+
+            try:
+                response = response[0]
+            except:
+                return 0, 0
+
+        except Exception as es:
+            print(f'Ошибка SQL maximal_orders_all_marketplaces_by_day: {es}')
 
             return 0, 0
 
@@ -235,9 +295,37 @@ class BotDB:
             except:
                 return 0, 0
 
-
         except Exception as es:
             print(f'Ошибка SQL get_all_orders_by_brand: {es}')
+
+            return 0, 0
+
+        return response
+
+    def get_maximum_all_orders_by_brand(self, marketplace, brand, _type):
+        try:
+
+            result = self.cursor.execute(f"""
+                SELECT MAX(SUM_COUNT) AS max_count, MAX(SUM_MONEY) AS max_money
+                FROM (
+                    SELECT SUM(count) AS SUM_COUNT, SUM(money) AS SUM_MONEY
+                    FROM statistic
+                    WHERE marketplace = '{marketplace}'
+                      AND brand = '{brand}'
+                      AND type = '{_type}'
+                    GROUP BY date
+                ) AS subquery
+            """)
+
+            response = result.fetchall()
+
+            try:
+                response = response[0]
+            except:
+                return 0, 0
+
+        except Exception as es:
+            print(f'Ошибка SQL get_maximum_all_orders_by_brand: {es}')
 
             return 0, 0
 
