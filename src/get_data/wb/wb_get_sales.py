@@ -34,7 +34,14 @@ async def wb_get_sales(BotDB, target_day):
             money = 0
 
             for sale in data_statistic:
-                money += sale['forPay']
+                try:
+                    money += sale['forPay']
+                except Exception as es:
+                    error_ = f'Ошибка при подсчете выручки "{es}"'
+
+                    await logger_msg(error_)
+
+                    break
 
             sales = len(data_statistic)
 
