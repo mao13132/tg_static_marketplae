@@ -177,7 +177,7 @@ class TagsBlock:
         maximal_total = self.BotDB.maximal_orders_all_brand_by_day('order', self.access_user_brands)
 
         if maximal_total and self.total_order and self.total_money:
-            if self.total_order > maximal_total[0] or self.total_money > maximal_total[1]:
+            if self.total_order >= maximal_total[0] or self.total_money >= maximal_total[1]:
                 total_data_row_text = f"{total_data_row_text} 🍾🟢"
 
         message_tags = generate_msg_by_tags(data_one, total_data_row_text)

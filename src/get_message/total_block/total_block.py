@@ -45,7 +45,7 @@ class TotalBlock:
         maximal_summ = self.BotDB.maximal_orders_all_marketplaces_by_day(marketplace, 'order', brand_list)
 
         if maximal_summ and all_order_by_place_now:
-            if all_order_by_place_now[0] > maximal_summ[0] or all_order_by_place_now[1] > maximal_summ[1]:
+            if all_order_by_place_now[0] >= maximal_summ[0] or all_order_by_place_now[1] >= maximal_summ[1]:
                 data_row_text = f"{data_row_text} 🍾🟢"
 
         exist_place = self.data.get(marketplace, False)
