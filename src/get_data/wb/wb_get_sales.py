@@ -30,6 +30,9 @@ async def wb_get_sales(BotDB, target_day):
 
         data_statistic = await wb_core.loop_get_sales(brand, target_day)
 
+        if not data_statistic:
+            continue
+
         if data_statistic:
             money = 0
 

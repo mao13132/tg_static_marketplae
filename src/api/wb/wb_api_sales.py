@@ -14,10 +14,11 @@ import aiohttp
 from src.api.wb.get_api_key import wb_get_api_key
 from src.api.wb.wb_api_core import WBApiCore
 from src.logger._logger import logger_msg
+from src.logger.telegram.telegram_debug_no_sync import SendlerOneCreate
 
 
 class WBApiSales(WBApiCore):
-    async def _get_sales_and_profit(self, api_key, start_date):
+    async def _get_sales_and_profit(self, api_key, start_date, brand):
         url_get_img = self.url_statistic + f'api/v1/supplier/sales?dateFrom={start_date}&flag=1'
 
         headers_price = {'Content-Type': 'application/json',
@@ -34,6 +35,15 @@ class WBApiSales(WBApiCore):
 
                     if resul.status == 200 and not response:
                         await logger_msg(f'WB API SALES: Нулевой ответ от серверов WB ')
+
+                        return False
+
+                    if resul.status == 401:
+                        error_ = f'Не рабочий токен у {brand} WB'
+
+                        SendlerOneCreate('').save_text(error_)
+
+                        await logger_msg(error_)
 
                         return False
 
@@ -69,7 +79,7 @@ class WBApiSales(WBApiCore):
             return False
 
         for _try in range(self.count_try):
-            data_response = await self._get_sales_and_profit(api_key, start_date)
+            data_response = await self._get_sales_and_profit(api_key, start_date, brand)
 
             if data_response == '-1':
                 time.sleep(self.time_try)

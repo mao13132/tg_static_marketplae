@@ -102,6 +102,8 @@ class WBApiOrders(WBApiCore):
             try:
                 result = data_response['data']
             except:
+                time.sleep(60)
+
                 continue
 
             return result
