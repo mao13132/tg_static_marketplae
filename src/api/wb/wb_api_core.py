@@ -17,7 +17,7 @@ class WBApiCore:
 
         self.url_advert = f'https://advert-api.wb.ru/adv/'
 
-        self.url_discount = f'https://discounts-prices-api.wb.ru/'
+        self.url_discount = f'https://discounts-prices-api.wildberries.ru/'
 
         self.new_analitic_url = f'https://seller-analytics-api.wildberries.ru/'
 

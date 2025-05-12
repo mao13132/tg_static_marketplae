@@ -28,7 +28,7 @@ async def main():
     scheduler = AsyncIOScheduler()
     # await CheckTime(bot_start).check_scheduler()
 
-    scheduler.add_job(CheckTime(bot_start).check_scheduler, 'interval', seconds=60, misfire_grace_time=300)
+    # scheduler.add_job(CheckTime(bot_start).check_scheduler, 'interval', seconds=60, misfire_grace_time=300)
 
     registration_state(bot_start.dp)
     registration_all_handlers(bot_start.dp)
