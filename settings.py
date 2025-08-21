@@ -28,6 +28,7 @@ NAME_BRAND = {
     8: 'Militon',
     6: 'Kronly',  # это ФДИ
     10: 'Spets',
+    11: 'Слиппи',
 }
 
 STOP_BRAND_FILTER = [
@@ -43,6 +44,14 @@ STOP_BRAND_FILTER = [
         'marketpalce': 'wb',
         'brand': NAME_BRAND[8]
     },
+    {
+        'marketpalce': 'ozon',
+        'brand': NAME_BRAND[0]
+    },
+    {
+        'marketpalce': 'ozon',
+        'brand': NAME_BRAND[8]
+    },
 
 ]
 
@@ -51,6 +60,7 @@ BRANDS_BY_DIRECTION = {
     "Швейное производство": [NAME_BRAND[7]],
     "Фабрика деревянных изделий": [NAME_BRAND[6]],
     "Продукты питания": [NAME_BRAND[3], NAME_BRAND[4], NAME_BRAND[0]],
+    "УстьеЛес Групп": [NAME_BRAND[11]],
 }
 
 OZON_API_KEY_LIST = {
@@ -61,6 +71,7 @@ OZON_API_KEY_LIST = {
     NAME_BRAND[7]: [os.getenv('CLIENT_ID8'), os.getenv('OZON_API_KEY8')],
     NAME_BRAND[8]: [os.getenv('CLIENT_ID9'), os.getenv('OZON_API_KEY9')],
     NAME_BRAND[10]: [os.getenv('CLIENT_ID10'), os.getenv('OZON_API_KEY10')],
+    NAME_BRAND[11]: [os.getenv('CLIENT_ID_SLIPY'), os.getenv('OZON_API_SLIPY')],
 }
 
 WB_API_KEY_LIST = {
@@ -68,6 +79,7 @@ WB_API_KEY_LIST = {
     NAME_BRAND[6]: [os.getenv('api_key_fdi'), os.getenv('api_key_fdi2')],
     NAME_BRAND[7]: [os.getenv('api_key_shelepina'), os.getenv('api_key_shelepina2')],
     NAME_BRAND[10]: [os.getenv('api_key_spets'), os.getenv('api_key_spets2')],
+    NAME_BRAND[11]: [os.getenv('API_KEY_WB_SLIPY'), os.getenv('API_KEY_WB_SLIPY')],
 }
 
 ACCESS = {
@@ -79,11 +91,12 @@ ACCESS = {
     '1156080458': [NAME_BRAND[6]],  # https://t.me/AntonPanev
     '848910101': [NAME_BRAND[7]],  # https://t.me/mashashchepelina
     '904730678': [NAME_BRAND[10]],  # @hellomynameisfabulousss
+    '772342377': [NAME_BRAND[11]],  # Евгений прислал
 }
 
 ADMIN = ['1422194909', '424814919', '1635185381', '461274940']
 
-SEND_STATISTIC = ['1422194909', '424814919', '1635185381', '461274940', '825951936', '1156080458', '848910101', '904730678']
+SEND_STATISTIC = ['1422194909', '424814919', '1635185381', '461274940', '825951936', '1156080458', '848910101', '904730678', '772342377']
 # SEND_STATISTIC = ['1422194909']
 
 # WEEK STATISTIC FROM GOOGLE SHEET
