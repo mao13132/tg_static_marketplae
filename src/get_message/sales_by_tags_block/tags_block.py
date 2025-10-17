@@ -70,28 +70,28 @@ class TagsBlock:
 
                 message = f'Tags_block: нет данных за позавчерашний день "{brand}" по кол-ву заказов'
 
-                await logger_msg(message, push=True)
+                await logger_msg(message)
 
             if orders_yesterday_money is None:
                 orders_yesterday_money = 0
 
                 message = f'Tags_block: нет данных за позавчерашний день "{brand}" по сумме заказов'
 
-                await logger_msg(message, push=True)
+                await logger_msg(message)
 
             if orders_now_count is None:
                 orders_now_count = 0
 
                 message = f'Tags_block: нет данных за вчерашний день "{brand}" по кол-ву заказов'
 
-                await logger_msg(message, push=True)
+                await logger_msg(message)
 
             if orders_now_money is None:
                 orders_now_money = 0
 
                 message = f'Tags_block: нет данных за вчерашний день "{brand}" по сумме заказов'
 
-                await logger_msg(message, push=True)
+                await logger_msg(message)
 
             self.total_order += orders_now_count
 
