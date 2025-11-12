@@ -29,6 +29,7 @@ NAME_BRAND = {
     6: 'Kronly',  # это ФДИ
     10: 'Spets',
     11: 'Слиппи',
+    12: 'Spets Nutri care'
 }
 
 STOP_BRAND_FILTER = [
@@ -60,7 +61,7 @@ STOP_BRAND_FILTER = [
 ]
 
 BRANDS_BY_DIRECTION = {
-    "Завод бытовой химии": [NAME_BRAND[10]],
+    "Завод бытовой химии": [NAME_BRAND[10], NAME_BRAND[12]],
     # "Швейное производство": [NAME_BRAND[7]],
     "Фабрика деревянных изделий": [NAME_BRAND[6]],
     "Продукты питания": [NAME_BRAND[3], NAME_BRAND[4], NAME_BRAND[0]],
@@ -76,6 +77,7 @@ OZON_API_KEY_LIST = {
     NAME_BRAND[8]: [os.getenv('CLIENT_ID9'), os.getenv('OZON_API_KEY9')],
     NAME_BRAND[10]: [os.getenv('CLIENT_ID10'), os.getenv('OZON_API_KEY10')],
     NAME_BRAND[11]: [os.getenv('CLIENT_ID_SLIPY'), os.getenv('OZON_API_SLIPY')],
+    NAME_BRAND[12]: [os.getenv('CLIENT_ID_NUTRI'), os.getenv('OZON_API_NUTRI')],
 }
 
 WB_API_KEY_LIST = {
@@ -84,6 +86,7 @@ WB_API_KEY_LIST = {
     # NAME_BRAND[7]: [os.getenv('api_key_shelepina'), os.getenv('api_key_shelepina2')],
     NAME_BRAND[10]: [os.getenv('api_key_spets'), os.getenv('api_key_spets2')],
     NAME_BRAND[11]: [os.getenv('API_KEY_WB_SLIPY'), os.getenv('API_KEY_WB_SLIPY')],
+    NAME_BRAND[12]: [os.getenv('API_KEY_WB_NUTRI'), os.getenv('API_KEY_WB_NUTRI')],
 }
 
 ACCESS = {

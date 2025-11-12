@@ -43,7 +43,10 @@ class SalesBlock:
             maximal_orders = self.BotDB.get_maximum_all_orders_by_brand(marketplace, brand, 'order')
 
             if maximal_orders and orders_now:
-                if orders_now[0] >= maximal_orders[0] or orders_now[1] >= maximal_orders[1]:
+                maximal_orders_one = maximal_orders[0] if maximal_orders[0] else 0
+                maximal_orders_second = maximal_orders[1] if maximal_orders[1] else 0
+
+                if orders_now[0] >= maximal_orders_one or orders_now[1] >= maximal_orders_second:
                     data_row_text = f"{data_row_text} 🍾🟢"
 
             self.msg += f'{brand} ({marketplace.upper()}): {data_row_text}\n'
