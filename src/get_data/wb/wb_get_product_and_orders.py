@@ -8,8 +8,9 @@
 # ---------------------------------------------
 from settings import WB_API_KEY_LIST
 from src.api.wb.calculation_orders import calculation_orders
-from src.api.wb.wb_api_get_orders import WBApiOrders
+from src.api.wb.wb_api_supplier_orders import WBApiSupplierOrders
 from src.api.wb.wb_api_get_products import WBApiGetProducts
+from src.api.wb.wb_orders_formatter import format_supplier_orders_to_history
 from src.get_message.filter_brand.filter_brand import filter_brand
 from src.logger._logger import logger_msg
 
@@ -17,7 +18,7 @@ from src.logger._logger import logger_msg
 async def wb_get_product_and_orders(BotDB, target_day):
     print(f'\nНачинаю получать заказы с WB\n')
 
-    wb_core = WBApiOrders()
+    wb_core = WBApiSupplierOrders()
 
     is_good = True
 
@@ -40,24 +41,8 @@ async def wb_get_product_and_orders(BotDB, target_day):
         article_list = [product['nmID'] for product in products]
 
         print(f'Начинаю получать заказы с {brand}')
-
-        len_article_list = len(article_list)
-
-        if len_article_list > 20:
-            good_response = []
-
-            for x in range(0, len_article_list, 20):
-                data_statistic = await wb_core.loop_get_orders_by_article(brand, article_list[x:x + 20], target_day)
-
-                if not data_statistic:
-                    continue
-
-                good_response.extend(data_statistic)
-
-            data_statistic = good_response
-
-        else:
-            data_statistic = await wb_core.loop_get_orders_by_article(brand, article_list, target_day)
+        orders_raw = await wb_core.loop_get_orders_for_date(brand, target_day)
+        data_statistic = format_supplier_orders_to_history(orders_raw, article_list)
 
         if data_statistic:
 

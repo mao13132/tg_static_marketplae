@@ -72,44 +72,5 @@ class WBApiOrders(WBApiCore):
         return True
 
     async def loop_get_orders_by_article(self, brand, article_list, start_date):
-
-        api_key = await wb_get_api_key(brand, 0)
-
-        if not api_key:
-            return False
-
-        for _try in range(self.count_try):
-            data_response = await self._get_orders(api_key, article_list, start_date)
-
-            if data_response == '-1':
-                time.sleep(60)
-
-                continue
-
-            if not data_response:
-                return False
-
-            is_error = await self.check_error(data_response, brand)
-
-            if is_error == '-1':
-                time.sleep(60)
-
-                continue
-
-            if is_error:
-                return False
-
-            try:
-                result = data_response['data']
-            except:
-                time.sleep(60)
-
-                continue
-
-            return result
-
-        msg = f'WB API Orders: исчерпаны все попытки на получение заказов у {brand}'
-
-        await logger_msg(msg, push=True)
-
+        await logger_msg('WB API Orders: метод отключён, используйте WBApiSupplierOrders', push=True)
         return False
