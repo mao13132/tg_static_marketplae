@@ -46,7 +46,8 @@ class SalesBlock:
                 maximal_orders_one = maximal_orders[0] if maximal_orders[0] else 0
                 maximal_orders_second = maximal_orders[1] if maximal_orders[1] else 0
 
-                if orders_now[0] >= maximal_orders_one or orders_now[1] >= maximal_orders_second:
+                if (orders_now[0] >= maximal_orders_one and maximal_orders_one) or (
+                        orders_now[1] >= maximal_orders_second and maximal_orders_second):
                     data_row_text = f"{data_row_text} 🍾🟢"
 
             self.msg += f'{brand} ({marketplace.upper()}): {data_row_text}\n'
