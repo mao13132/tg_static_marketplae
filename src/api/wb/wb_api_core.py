@@ -21,7 +21,7 @@ class WBApiCore:
 
         self.new_analitic_url = f'https://seller-analytics-api.wildberries.ru/'
 
-        self.time_try = 15
+        self.time_try = 20
 
         self.count_try = 10
 
