@@ -383,7 +383,7 @@ class BotDB:
             response = result.fetchall()
 
             # response = response[0]
-        except:
+        except Exception as es:
             return []
 
         return response

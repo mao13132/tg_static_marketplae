@@ -6,7 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import NAME_BRAND, MARKETPLACE, ACCESS
+from settings import MARKETPLACE, ACCESS
 from src.get_message.filter_brand.filter_brand import filter_brand
 from src.get_message.formate_row import formate_row
 
@@ -55,8 +55,13 @@ class SalesBlock:
         return True
 
     async def iter_brands(self):
-        for brand in self.security_brand:
+        for i, brand in enumerate(self.security_brand):
             result = await self.iter_market_place(brand)
+
+            if i < len(self.security_brand) - 1:
+                next_brand = self.security_brand[i + 1]
+                if next_brand != 'Kronly Agent':
+                    self.msg += '\n'
 
         return True
 
