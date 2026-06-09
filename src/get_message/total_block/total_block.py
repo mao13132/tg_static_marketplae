@@ -6,7 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import MARKETPLACE, ACCESS, NAME_BRAND, TARGET_DAY, ANALYST_DAY
+from settings import MARKETPLACE, ACCESS, NAME_BRAND, TARGET_DAY, ANALYST_DAY, BRANDS_SEPARATE_STATS
 from src.get_message.check_is_none import check_is_none_from_tuple
 from src.get_message.formate_row import formate_row
 from src.get_message.total_block.generate_msg_total import generate_msg_total, generate_msg_total_from_admin
@@ -27,17 +27,60 @@ class TotalBlock:
 
         self.data = {}
 
-    async def get_all_orders(self, marketplace, brand_list):
+    def _get_all_separate_brands(self, brand_list):
+        """
+        Получить все separate-бренды из BRANDS_SEPARATE_STATS которые:
+        1) относятся к списку API-брендов (через contains)
+        2) ЕСТЬ В ДОСТУПЕ у пользователя (self.security_brand)
+        
+        Args:
+            brand_list: список API-брендов
+            
+        Returns:
+            Список найденных брендов для отдельной статистики
+        """
+        if not BRANDS_SEPARATE_STATS:
+            return []
+        
+        found_brands = []
+        for separate_lower, separate_name in BRANDS_SEPARATE_STATS.items():
+            if separate_name not in found_brands and separate_name in self.security_brand:
+                found_brands.append(separate_name)
+        
+        return found_brands
 
-        all_order_by_place_now = self.BotDB.new_get_all_orders_by_marketplace(
+    async def get_all_orders(self, marketplace, brand_list):
+        # Используем case-insensitive метод для регистронезависимого сравнения брендов
+        all_order_by_place_now = self.BotDB.new_get_all_orders_by_marketplace_case(
             marketplace, self.target_day, 'order', brand_list)
 
         all_order_by_place_now = check_is_none_from_tuple(all_order_by_place_now)
 
-        all_order_by_place_yesterday = self.BotDB.new_get_all_orders_by_marketplace(
+        all_order_by_place_yesterday = self.BotDB.new_get_all_orders_by_marketplace_case(
             marketplace, self.analyst_day, 'order', brand_list)
 
         all_order_by_place_yesterday = check_is_none_from_tuple(all_order_by_place_yesterday)
+
+        # Если есть BRANDS_SEPARATE_STATS - добавляем статистику по найденным брендам
+        separate_brands = self._get_all_separate_brands(brand_list)
+        for sep_brand in separate_brands:
+            sep_now = self.BotDB.new_get_all_orders_by_marketplace_case(
+                marketplace, self.target_day, 'order', [sep_brand])
+            sep_yesterday = self.BotDB.new_get_all_orders_by_marketplace_case(
+                marketplace, self.analyst_day, 'order', [sep_brand])
+            
+            sep_now_tuple = check_is_none_from_tuple(sep_now)
+            sep_yesterday_tuple = check_is_none_from_tuple(sep_yesterday)
+            
+            # Прибавляем к основной статистике
+            all_order_by_place_now = (
+                all_order_by_place_now[0] + sep_now_tuple[0],
+                all_order_by_place_now[1] + sep_now_tuple[1]
+            )
+            all_order_by_place_yesterday = (
+                all_order_by_place_yesterday[0] + sep_yesterday_tuple[0],
+                all_order_by_place_yesterday[1] + sep_yesterday_tuple[1]
+            )
 
         data_row_text = await formate_row(all_order_by_place_now, all_order_by_place_yesterday)
 
@@ -64,15 +107,37 @@ class TotalBlock:
         return True
 
     async def get_all_sales(self, marketplace, brand_list):
-        all_sales_by_place_now = self.BotDB.new_get_all_orders_by_marketplace(
+        # Используем case-insensitive метод для регистронезависимого сравнения брендов
+        all_sales_by_place_now = self.BotDB.new_get_all_orders_by_marketplace_case(
             marketplace, self.target_day, 'sale', brand_list)
 
         all_sales_by_place_now = check_is_none_from_tuple(all_sales_by_place_now)
 
-        all_sales_by_place_yesterday = self.BotDB.new_get_all_orders_by_marketplace(
+        all_sales_by_place_yesterday = self.BotDB.new_get_all_orders_by_marketplace_case(
             marketplace, self.analyst_day, 'sale', brand_list)
 
         all_sales_by_place_yesterday = check_is_none_from_tuple(all_sales_by_place_yesterday)
+
+        # Если есть BRANDS_SEPARATE_STATS - добавляем статистику по найденным брендам
+        separate_brands = self._get_all_separate_brands(brand_list)
+        for sep_brand in separate_brands:
+            sep_now = self.BotDB.new_get_all_orders_by_marketplace_case(
+                marketplace, self.target_day, 'sale', [sep_brand])
+            sep_yesterday = self.BotDB.new_get_all_orders_by_marketplace_case(
+                marketplace, self.analyst_day, 'sale', [sep_brand])
+            
+            sep_now_tuple = check_is_none_from_tuple(sep_now)
+            sep_yesterday_tuple = check_is_none_from_tuple(sep_yesterday)
+            
+            # Прибавляем к основной статистике
+            all_sales_by_place_now = (
+                all_sales_by_place_now[0] + sep_now_tuple[0],
+                all_sales_by_place_now[1] + sep_now_tuple[1]
+            )
+            all_sales_by_place_yesterday = (
+                all_sales_by_place_yesterday[0] + sep_yesterday_tuple[0],
+                all_sales_by_place_yesterday[1] + sep_yesterday_tuple[1]
+            )
 
         data_row_text = await formate_row(all_sales_by_place_now, all_sales_by_place_yesterday)
 

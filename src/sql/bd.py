@@ -249,6 +249,43 @@ class BotDB:
 
         return response
 
+    def new_get_all_orders_by_marketplace_case(self, marketplace, day, _type, security_brand):
+        """
+        Получить статистику по маркетплейсу для списка брендов (регистронезависимо).
+        Аналог new_get_all_orders_by_marketplace, но с LOWER() для сравнения брендов.
+        
+        Args:
+            marketplace: маркетплейс (ozon/wb)
+            day: дата
+            _type: тип статистики (order/sale)
+            security_brand: список брендов для выборки
+            
+        Returns:
+            Кортеж (count, money) или (0, 0) при ошибке/отсутствии данных
+        """
+        try:
+            # Собираем условие для каждого бренда с LOWER()
+            brand_conditions = " OR ".join(f"LOWER(brand) = LOWER('{x}')" for x in security_brand)
+            
+            sql_query = (
+                f"SELECT SUM(count), SUM(money) FROM statistic "
+                f"WHERE marketplace = '{marketplace}' AND "
+                f"date = '{day}' AND type = '{_type}' AND ({brand_conditions})"
+            )
+            
+            result = self.cursor.execute(sql_query)
+            response = result.fetchall()
+            
+            if response and len(response) > 0:
+                count = response[0][0] if response[0] else 0
+                money = response[0][1] if response[0] else 0
+                return count, money
+            return 0, 0
+
+        except Exception as es:
+            print(f'Ошибка SQL new_get_all_orders_by_marketplace_case: {es}')
+            return 0, 0
+
     def maximal_orders_all_marketplaces_by_day(self, marketplace, _type, security_brand):
         try:
             sql_security = ", ".join(f"'{x}'" for x in security_brand)
@@ -435,3 +472,73 @@ class BotDB:
     def close(self):
         self.conn.close()
         print('Отключился от SQL BD')
+
+    # ================================================
+    # Методы с регистронезависимым сравнением брендов
+    # Используются для работы с BRANDS_SEPARATE_STATS
+    # ================================================
+
+    def get_all_orders_by_brand_case(self, marketplace, brand, day, _type):
+        """
+        Получить статистику по бренду и маркетплейсу (регистронезависимо).
+        Аналог get_all_orders_by_brand, но с LOWER() для сравнения брендов.
+        
+        Args:
+            marketplace: маркетплейс (ozon/wb)
+            brand: бренд
+            day: дата
+            _type: тип статистики (order/sale)
+            
+        Returns:
+            Кортеж (count, money) или (0, 0) при ошибке/отсутствии данных
+        """
+        try:
+            # Регистронезависимое сравнение через LOWER()
+            result = self.cursor.execute(
+                f"SELECT count, money FROM statistic "
+                f"WHERE marketplace = '{marketplace}' AND "
+                f"LOWER(brand) = LOWER('{brand}') AND "
+                f"date = '{day}' AND type = '{_type}'"
+            )
+            response = result.fetchall()
+            
+            # Безопасное извлечение результата
+            if response and len(response) > 0:
+                return response[0]
+            return 0, 0
+            
+        except Exception as es:
+            print(f'Ошибка SQL get_all_orders_by_brand_case: {es}')
+            return 0, 0
+
+    def get_all_marketplace_by_brands_case(self, brand, day, _type):
+        """
+        Получить статистику по бренду без маркетплейса (регистронезависимо).
+        Аналог get_all_marketplace_by_brands, но с LOWER() для сравнения брендов.
+        
+        Args:
+            brand: бренд
+            day: дата
+            _type: тип статистики (order/sale)
+            
+        Returns:
+            Кортеж (count, money) или (0, 0) при ошибке/отсутствии данных
+        """
+        try:
+            result = self.cursor.execute(
+                f"SELECT SUM(count), SUM(money) FROM statistic "
+                f"WHERE LOWER(brand) = LOWER('{brand}') AND "
+                f"date = '{day}' AND type = '{_type}'"
+            )
+            response = result.fetchall()
+            
+            if response and len(response) > 0:
+                # Используем .get() для безопасного извлечения из tuple
+                count = response[0][0] if response[0] else 0
+                money = response[0][1] if response[0] else 0
+                return count, money
+            return 0, 0
+            
+        except Exception as es:
+            print(f'Ошибка SQL get_all_marketplace_by_brands_case: {es}')
+            return 0, 0

@@ -6,7 +6,7 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import BRANDS_BY_DIRECTION, ACCESS, TARGET_DAY, ANALYST_DAY
+from settings import BRANDS_BY_DIRECTION, ACCESS, TARGET_DAY, ANALYST_DAY, BRANDS_SEPARATE_STATS
 from src.get_message.formate_row import formate_row
 from src.get_message.sales_by_tags_block.generate_msg_by_tags import generate_msg_by_tags
 from src.logger._logger import logger_msg
@@ -37,6 +37,23 @@ class TagsBlock:
 
         self.access_user_brands = []
 
+    def _get_separate_brands_for_brand(self, brand):
+        """
+        Найти separate-бренды из BRANDS_SEPARATE_STATS которые:
+        1) относятся к API-бренду (через contains)
+        2) ЕСТЬ В ДОСТУПЕ у пользователя (self.security_brand)
+        """
+        if not BRANDS_SEPARATE_STATS:
+            return []
+        
+        found_brands = []
+        
+        for separate_lower, separate_name in BRANDS_SEPARATE_STATS.items():
+            if separate_name in self.security_brand:
+                found_brands.append(separate_name)
+        
+        return found_brands
+
     async def plus_value(self, tags, _type, _value):
         if not _value:
             return False
@@ -51,62 +68,78 @@ class TagsBlock:
         return True
 
     async def iter_brands_list(self, brands_list, tags):
-
+        # Используем case-insensitive метод для регистронезависимого сравнения брендов
         for brand in brands_list:
-            orders_now = self.BotDB.get_all_marketplace_by_brands(brand, self.target_day, 'order')
+            orders_now = self.BotDB.get_all_marketplace_by_brands_case(brand, self.target_day, 'order')
 
-            orders_now_count = orders_now[0]
+            # Безопасное извлечение данных с проверками
+            orders_now_count = orders_now[0] if orders_now else 0
+            orders_now_money = orders_now[1] if orders_now else 0
 
-            orders_now_money = orders_now[1]
+            orders_yesterday = self.BotDB.get_all_marketplace_by_brands_case(brand, self.analyst_day, 'order')
 
-            orders_yesterday = self.BotDB.get_all_marketplace_by_brands(brand, self.analyst_day, 'order')
+            orders_yesterday_count = orders_yesterday[0] if orders_yesterday else 0
+            orders_yesterday_money = orders_yesterday[1] if orders_yesterday else 0
 
-            orders_yesterday_count = orders_yesterday[0]
+            # Если есть BRANDS_SEPARATE_STATS - добавляем статистику по найденным брендам
+            separate_brands = self._get_separate_brands_for_brand(brand)
+            for sep_brand in separate_brands:
+                sep_now = self.BotDB.get_all_marketplace_by_brands_case(
+                    sep_brand, self.target_day, 'order'
+                )
+                sep_yesterday = self.BotDB.get_all_marketplace_by_brands_case(
+                    sep_brand, self.analyst_day, 'order'
+                )
 
-            orders_yesterday_money = orders_yesterday[1]
+                orders_now_count = (orders_now_count or 0) + (
+                    sep_now[0] if sep_now and sep_now[0] is not None else 0
+                )
 
-            if orders_yesterday_count is None:
+                orders_now_money = (orders_now_money or 0) + (
+                    sep_now[1] if sep_now and sep_now[1] is not None else 0
+                )
+
+                orders_yesterday_count = (orders_yesterday_count or 0) + (
+                    sep_yesterday[0] if sep_yesterday and sep_yesterday[0] is not None else 0
+                )
+
+                orders_yesterday_money = (orders_yesterday_money or 0) + (
+                    sep_yesterday[1] if sep_yesterday and sep_yesterday[1] is not None else 0
+                )
+
+            # Логирование если данные отсутствуют (но не прерываем работу)
+            if orders_yesterday_count is None or orders_yesterday_count == 0:
+                message = f'Tags_block: нет данных за позавчерашний день "{brand}" по кол-ву заказов'
+                await logger_msg(message)
+
                 orders_yesterday_count = 0
 
-                message = f'Tags_block: нет данных за позавчерашний день "{brand}" по кол-ву заказов'
-
+            if orders_yesterday_money is None or orders_yesterday_money == 0:
+                message = f'Tags_block: нет данных за позавчерашний день "{brand}" по сумме заказов'
                 await logger_msg(message)
 
-            if orders_yesterday_money is None:
                 orders_yesterday_money = 0
 
-                message = f'Tags_block: нет данных за позавчерашний день "{brand}" по сумме заказов'
-
+            if orders_now_count is None or orders_now_count == 0:
+                message = f'Tags_block: нет данных за вчерашний день "{brand}" по кол-ву заказов'
                 await logger_msg(message)
 
-            if orders_now_count is None:
                 orders_now_count = 0
 
-                message = f'Tags_block: нет данных за вчерашний день "{brand}" по кол-ву заказов'
-
+            if orders_now_money is None or orders_now_money == 0:
+                message = f'Tags_block: нет данных за вчерашний день "{brand}" по сумме заказов'
                 await logger_msg(message)
 
-            if orders_now_money is None:
                 orders_now_money = 0
 
-                message = f'Tags_block: нет данных за вчерашний день "{brand}" по сумме заказов'
-
-                await logger_msg(message)
-
             self.total_order += orders_now_count
-
             self.total_money += orders_now_money
-
             self.total_order_yesterday += orders_yesterday_count
-
             self.total_money_yesterday += orders_yesterday_money
 
             await self.plus_value(tags, 'total_orders', orders_now_count)
-
             await self.plus_value(tags, 'total_money', orders_now_money)
-
             await self.plus_value(tags, 'total_orders_yesterday', orders_yesterday_count)
-
             await self.plus_value(tags, 'total_money_yesterday', orders_yesterday_money)
 
         data_row_text = await formate_row(

@@ -6,9 +6,10 @@
 # 1.0       2023    Initial Version
 #
 # ---------------------------------------------
-from settings import WB_API_KEY_LIST
+from settings import WB_API_KEY_LIST, BRANDS_SEPARATE_STATS
 from src.api.wb.wb_api_sales import WBApiSales
 from src.get_message.filter_brand.filter_brand import filter_brand
+from src.get_data.wb.process_separate_brand_stats_wb import process_separate_brand_stats_wb
 from src.logger._logger import logger_msg
 
 
@@ -33,40 +34,61 @@ async def wb_get_sales(BotDB, target_day):
         if not data_statistic:
             continue
 
-        if data_statistic:
-            money = 0
+        sales = len(data_statistic)
+        money = 0
 
-            for sale in data_statistic:
-                try:
-                    money += sale['forPay']
-                except Exception as es:
-                    error_ = f'Ошибка при подсчете выручки "{es}"'
+        for sale in data_statistic:
+            try:
+                money += sale['forPay']
+            except Exception as es:
+                error_ = f'Ошибка при подсчете выручки "{es}"'
+                await logger_msg(error_)
+                break
 
-                    await logger_msg(error_)
+        money = round(money, 2)
 
-                    break
+        # Обработка брендов для отдельной статистики
+        if BRANDS_SEPARATE_STATS and data_statistic:
+            result = await process_separate_brand_stats_wb(
+                data_statistic, BRANDS_SEPARATE_STATS
+            )
 
-            sales = len(data_statistic)
+            if result:
+                # Сохраняем статистику по найденным брендам (исключение из общей)
+                separate_stats = result.get('separate_stats', {})
+                for found_brand, stats in separate_stats.items():
+                    sql_data = {
+                        'marketplace': 'wb',
+                        'brand': found_brand,  # Найденный бренд товара
+                        'type': 'order',
+                        'count': stats['count'],
+                        'money': stats['money'],
+                        'date': target_day,
+                    }
+                    BotDB.check_or_add_static(sql_data)
+                    print(f'  -> Отдельная статистика: бренд "{found_brand}", '
+                          f'{stats["count"]} продаж, {stats["money"]:.2f} выручки')
 
-            money = round(money, 2)
-        else:
-            money = 0
+                # Вычитаем из основной статистики то, что ушло в отдельные бренды
+                total_separate = result.get('total_separate', {})
+                sales -= total_separate.get('count', 0)
+                money -= total_separate.get('money', 0)
 
-            sales = 0
+        # Записываем основную статистику по API-ключу (за вычетом найденных брендов)
+        if sales > 0 or money > 0:
+            sql_data = {
+                'marketplace': 'wb',
+                'brand': brand,
+                'type': 'sale',
+                'count': sales,
+                'money': money,
+                'date': target_day,
+            }
 
-        sql_data = {
-            'marketplace': 'wb',
-            'brand': brand,
-            'type': 'sale',
-            'count': sales,
-            'money': money,
-            'date': target_day,
-        }
+            res = BotDB.check_or_add_static(sql_data)
 
-        res = BotDB.check_or_add_static(sql_data)
-
-        if not res:
-            is_good = False
+            if not res:
+                is_good = False
 
         print(f'Обработал продажи WB "{brand}"')
 
