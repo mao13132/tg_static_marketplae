@@ -42,40 +42,58 @@ async def wb_get_product_and_orders(BotDB, target_day):
         # Считаем общую статистику
         orders = len(orders_data)
         money = 0
+        finishedPrice = 0
+        priceWithDisc = 0
+        totalPrice = 0
         for order in orders_data:
             try:
-                money += order.get('forPay', 0)
+                money += order.get('totalPrice', 0)
+            except Exception:
+                continue
+
+            try:
+                finishedPrice += order.get('finishedPrice', 0)
+            except Exception:
+                continue
+
+            try:
+                priceWithDisc += order.get('priceWithDisc', 0)
+            except Exception:
+                continue
+
+            try:
+                totalPrice += order.get('totalPrice', 0)
             except Exception:
                 continue
 
         money = round(money, 2)
 
-        # # Обработка брендов для отдельной статистики
-        # if BRANDS_SEPARATE_STATS and orders_data:
-        #     result = await process_separate_brand_stats_wb(
-        #         orders_data, BRANDS_SEPARATE_STATS
-        #     )
-        #
-        #     if result:
-        #         # Сохраняем статистику по найденным брендам (исключение из общей)
-        #         separate_stats = result.get('separate_stats', {})
-        #         for found_brand, stats in separate_stats.items():
-        #             sql_data = {
-        #                 'marketplace': 'wb',
-        #                 'brand': found_brand,  # Найденный бренд товара
-        #                 'type': 'order',
-        #                 'count': stats['count'],
-        #                 'money': stats['money'],
-        #                 'date': target_day,
-        #             }
-        #             BotDB.check_or_add_static(sql_data)
-        #             print(f'  -> Отдельная статистика: бренд "{found_brand}", '
-        #                   f'{stats["count"]} заказов, {stats["money"]:.2f} выручки')
-        #
-        #         # Вычитаем из основной статистики то, что ушло в отдельные бренды
-        #         total_separate = result.get('total_separate', {})
-        #         orders -= total_separate.get('count', 0)
-        #         money -= total_separate.get('money', 0)
+        # Обработка брендов для отдельной статистики
+        if BRANDS_SEPARATE_STATS and orders_data:
+            result = await process_separate_brand_stats_wb(
+                orders_data, BRANDS_SEPARATE_STATS
+            )
+
+            if result:
+                # Сохраняем статистику по найденным брендам (исключение из общей)
+                separate_stats = result.get('separate_stats', {})
+                for found_brand, stats in separate_stats.items():
+                    sql_data = {
+                        'marketplace': 'wb',
+                        'brand': found_brand,  # Найденный бренд товара
+                        'type': 'order',
+                        'count': stats['count'],
+                        'money': stats['money'],
+                        'date': target_day,
+                    }
+                    BotDB.check_or_add_static(sql_data)
+                    print(f'  -> Отдельная статистика: бренд "{found_brand}", '
+                          f'{stats["count"]} заказов, {stats["money"]:.2f} выручки')
+
+                # Вычитаем из основной статистики то, что ушло в отдельные бренды
+                total_separate = result.get('total_separate', {})
+                orders -= total_separate.get('count', 0)
+                money -= total_separate.get('money', 0)
 
         # Записываем основную статистику по API-ключу (за вычетом найденных брендов)
         if orders > 0 or money > 0:

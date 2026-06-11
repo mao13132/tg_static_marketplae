@@ -29,7 +29,7 @@ class SalesBlock:
     def _get_separate_brands_for_brand(self, brand):
         """
         Найти separate-бренды из BRANDS_SEPARATE_STATS которые:
-        1) относятся к API-бренду (через contains)
+        1) относятся к API-бренду (ключ contains в brand)
         2) ЕСТЬ В ДОСТУПЕ у пользователя (self.security_brand)
         
         Args:
@@ -42,11 +42,15 @@ class SalesBlock:
             return []
         
         found_brands = []
+        brand_lower = brand.lower()
         
         # Проверяем каждый separate-бренд
         for separate_lower, separate_name in BRANDS_SEPARATE_STATS.items():
-            if separate_name in self.security_brand:
-                found_brands.append(separate_name)
+            # Ключ (separate_lower) должен содержаться в brand
+            if separate_lower in brand_lower:
+                # И имя бренда должно быть в доступе пользователя
+                if separate_name in self.security_brand:
+                    found_brands.append(separate_name)
         
         return found_brands
 
@@ -58,27 +62,14 @@ class SalesBlock:
             if stop_filter:
                 continue
 
-            # Используем case-insensitive метод для регистронезависимого сравнения брендов
+            # Получаем статистику по основному бренду
             orders_now = self.BotDB.get_all_orders_by_brand_case(marketplace, brand, self.target_day, 'order')
-
             orders_yesterday = self.BotDB.get_all_orders_by_brand_case(marketplace, brand, self.analyst_day, 'order')
 
-            # Безопасное извлечение данных с .get() на случай если данных нет
             orders_now_count = orders_now[0] if orders_now else 0
             orders_now_money = orders_now[1] if orders_now else 0
             orders_yesterday_count = orders_yesterday[0] if orders_yesterday else 0
             orders_yesterday_money = orders_yesterday[1] if orders_yesterday else 0
-
-            # Если есть BRANDS_SEPARATE_STATS - добавляем статистику по найденным брендам
-            separate_brands = self._get_separate_brands_for_brand(brand)
-            for sep_brand in separate_brands:
-                sep_now = self.BotDB.get_all_orders_by_brand_case(marketplace, sep_brand, self.target_day, 'order')
-                sep_yesterday = self.BotDB.get_all_orders_by_brand_case(marketplace, sep_brand, self.analyst_day, 'order')
-                
-                orders_now_count += sep_now[0] if sep_now else 0
-                orders_now_money += sep_now[1] if sep_now else 0
-                orders_yesterday_count += sep_yesterday[0] if sep_yesterday else 0
-                orders_yesterday_money += sep_yesterday[1] if sep_yesterday else 0
 
             data_row_text = await formate_row(
                 (orders_now_count, orders_now_money),
@@ -100,6 +91,9 @@ class SalesBlock:
         return True
 
     async def iter_brands(self):
+        # Собираем все бренды (основные + separate)
+        all_brands = list(self.security_brand)
+        
         # Сортируем бренды по BRANDS_ORDER (если есть), иначе по алфавиту
         def get_brand_priority(brand):
             if BRANDS_ORDER and brand in BRANDS_ORDER:
@@ -107,7 +101,7 @@ class SalesBlock:
             # Большое число чтобы бренды без порядка были в конце
             return 999
         
-        sorted_brands = sorted(self.security_brand, key=get_brand_priority)
+        sorted_brands = sorted(all_brands, key=get_brand_priority)
         
         for i, brand in enumerate(sorted_brands):
             result = await self.iter_market_place(brand)

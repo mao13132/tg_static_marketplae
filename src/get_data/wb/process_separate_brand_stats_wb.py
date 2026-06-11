@@ -59,7 +59,7 @@ async def process_separate_brand_stats_wb(sales_data, brands_config):
                         separate_stats[target_brand] = {'count': 0, 'money': 0}
 
                     # Получаем сумму продажи
-                    for_pay = sale.get('forPay', 0)
+                    for_pay = sale.get('totalPrice', 0)
 
                     separate_stats[target_brand]['count'] += 1
                     separate_stats[target_brand]['money'] += for_pay
