@@ -52,6 +52,14 @@ STOP_BRAND_FILTER = [
         'marketpalce': 'ozon',
         'brand': NAME_BRAND[14]
     },
+    {
+        'marketpalce': 'ozon',
+        'brand': NAME_BRAND[18]
+    },
+    {
+        'marketpalce': 'wb',
+        'brand': NAME_BRAND[18]
+    },
 
     # {
     #     'marketpalce': 'ozon',
